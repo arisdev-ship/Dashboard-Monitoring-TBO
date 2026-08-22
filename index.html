@@ -37,7 +37,7 @@
             <h1 class="text-sm sm:text-base font-bold text-white tracking-tight">Executive Procurement & Datamart Dashboard</h1>
             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              LIVE SHEET
+              LIVE GOOGLE SHEET
             </span>
           </div>
           <p class="text-[11px] text-slate-400">Monitoring Kontrak Vendor, Alokasi Anggaran OPEX/CAPEX, & Request Datamart</p>
@@ -100,7 +100,7 @@
       </div>
 
       <div id="lastUpdatedBadge" class="text-[11px] text-slate-500 font-mono hidden md:block">
-        Sinkronisasi: Memuat...
+        Sinkronisasi: Memuat data...
       </div>
     </div>
 
@@ -610,8 +610,11 @@
     </div>
   </div>
 
-  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <!-- ================= JAVASCRIPT LOGIC (DIRECT GOOGLE SHEET SYNC) ================= -->
   <script>
+    // ID SPREADSHEET GOOGLE ANDA
+    const GOOGLE_SHEET_ID = '1MgeRBXOfYrK3aN3sMhodMwxmJjX7OOlRqNYOZ-H3gpA';
+
     let appData = { procurement: [], anggaran: [], datamart: [] };
     let currentTab = 'overview';
     let activeCardFilters = { rkf: 'ALL', priority: 'ALL' };
@@ -625,6 +628,240 @@
     function formatRupiah(num) {
       if (!num || num === 0) return 'Rp 0';
       return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+    }
+
+    function calculatePaymentPriority(endKontrakStr, status) {
+      if (!status) status = '';
+      if (status.toLowerCase().includes('done') || status.toLowerCase().includes('selesai')) {
+        return { daysUntilDue: 0, priority: 'Completed' };
+      }
+      if (!endKontrakStr || endKontrakStr.trim() === '') {
+        return { daysUntilDue: null, priority: 'Pending' };
+      }
+      try {
+        let cleaned = endKontrakStr.trim()
+          .replace(/Agt/g, 'Aug').replace(/Ags/g, 'Aug').replace(/Des/g, 'Dec')
+          .replace(/Mei/g, 'May').replace(/Okt/g, 'Oct').replace(/Januari/gi, 'Jan')
+          .replace(/Februari/gi, 'Feb').replace(/Maret/gi, 'Mar').replace(/April/gi, 'Apr')
+          .replace(/Juni/gi, 'Jun').replace(/Juli/gi, 'Jul').replace(/Agustus/gi, 'Aug')
+          .replace(/September/gi, 'Sep').replace(/Oktober/gi, 'Oct').replace(/November/gi, 'Nov')
+          .replace(/Desember/gi, 'Dec');
+
+        const parsedDate = new Date(cleaned);
+        if (isNaN(parsedDate.getTime())) return { daysUntilDue: null, priority: 'Pending' };
+
+        const today = new Date('2026-07-31T00:00:00');
+        const diffTime = parsedDate.getTime() - today.getTime();
+        const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (days < 0 || days <= 30) return { daysUntilDue: days, priority: 'Urgent' };
+        else if (days <= 60) return { daysUntilDue: days, priority: 'Upcoming' };
+        else return { daysUntilDue: days, priority: 'Safe' };
+      } catch {
+        return { daysUntilDue: null, priority: 'Pending' };
+      }
+    }
+
+    function parseCSVLine(line) {
+      const row = [];
+      let inQuotes = false;
+      let current = '';
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') inQuotes = !inQuotes;
+        else if (char === ',' && !inQuotes) { row.push(current.trim()); current = ''; }
+        else current += char;
+      }
+      row.push(current.trim());
+      return row;
+    }
+
+    function parseNum(val) {
+      if (!val) return 0;
+      let cleaned = val.replace(/^"|"$/g, '').replace(/Rp\s?/gi, '').trim();
+      if (cleaned.includes(',') && cleaned.includes('.')) cleaned = cleaned.replace(/,/g, '');
+      else if (cleaned.includes('.')) {
+        if ((cleaned.match(/\./g) || []).length > 1) cleaned = cleaned.replace(/\./g, '');
+      } else if (cleaned.includes(',')) cleaned = cleaned.replace(/,/g, '');
+      const parsed = parseFloat(cleaned);
+      return isNaN(parsed) ? 0 : parsed;
+    }
+
+    function cleanText(val) {
+      if (!val) return '';
+      return val.replace(/^"|"$/g, '').trim();
+    }
+
+    function cleanUrl(val) {
+      if (!val) return '#';
+      const cleaned = cleanText(val);
+      const m1 = cleaned.match(/HYPERLINK\("([^"]+)"/i);
+      if (m1 && m1[1]) return m1[1];
+      const m2 = cleaned.match(/(https?:\/\/[^\s",)]+)/i);
+      if (m2 && m2[1]) return m2[1];
+      return cleaned || '#';
+    }
+
+    // DIRECT FETCH DARI GOOGLE SHEET API (KOMPATIBEL DENGAN VERCEL & GITHUB)
+    async function loadAllData() {
+      const refreshBtn = document.getElementById('refreshBtn');
+      if (refreshBtn) refreshBtn.classList.add('animate-spin');
+
+      try {
+        const procUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv`;
+        const angUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Anggaran`;
+        const dmUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Request%20Datamart`;
+
+        const [rProc, rAng, rDm] = await Promise.all([
+          fetch(procUrl).then(r => r.text()),
+          fetch(angUrl).then(r => r.text()).catch(() => ''),
+          fetch(dmUrl).then(r => r.text()).catch(() => '')
+        ]);
+
+        // 1. Parse Procurement Sheet
+        const pLines = rProc.split('\n').filter(l => l.trim().length > 0);
+        if (pLines.length >= 2) {
+          const rows = pLines.map(parseCSVLine);
+          const headers = rows[0].map(h => h.toLowerCase().trim().replace(/^"|"$/g, ''));
+          
+          const findCol = (patterns) => {
+            for (const p of patterns) {
+              const idx = headers.findIndex(h => h === p || h.startsWith(p));
+              if (idx !== -1) return idx;
+            }
+            for (const p of patterns) {
+              const idx = headers.findIndex(h => h.includes(p));
+              if (idx !== -1) return idx;
+            }
+            return -1;
+          };
+
+          const colId = findCol(['id']) !== -1 ? findCol(['id']) : 0;
+          const colProker = findCol(['nama project', 'proker']) !== -1 ? findCol(['nama project', 'proker']) : 1;
+          const colTask = findCol(['nama task', 'task']) !== -1 ? findCol(['nama task', 'task']) : 2;
+          const colRkf = findCol(['rkf', 'status rkf', 'rkf / non-rkf', 'kategori rkf']);
+          const colTipePengadaan = findCol(['tipe pengadaan']) !== -1 ? findCol(['tipe pengadaan']) : 3;
+          const colTipeProject = findCol(['tipe project']) !== -1 ? findCol(['tipe project']) : 4;
+          const colVendor = findCol(['vendor']) !== -1 ? findCol(['vendor']) : 5;
+          const colPic = findCol(['pic']) !== -1 ? findCol(['pic']) : 6;
+          const colJenisAnggaran = findCol(['jenis anggaran']) !== -1 ? findCol(['jenis anggaran']) : 7;
+          const colCost = findCol(['cost', 'biaya', 'nilai']) !== -1 ? findCol(['cost', 'biaya', 'nilai']) : 9;
+          const colKuota = findCol(['kuota']) !== -1 ? findCol(['kuota']) : 10;
+          const colTotalPemakaian = findCol(['total pemakaian', 'pemakaian']) !== -1 ? findCol(['total pemakaian', 'pemakaian']) : 11;
+          const colUtilisasi = findCol(['utilisasi', 'utlisisasi']) !== -1 ? findCol(['utilisasi', 'utlisisasi']) : 12;
+          const colStatusBilling = findCol(['status billing']);
+          const colStartKontrak = findCol(['start kontrak', 'mulai']) !== -1 ? findCol(['start kontrak', 'mulai']) : 16;
+          const colEndKontrakR = headers.findIndex(h => h === 'end kontrak');
+          const colEndKontrakFallback = findCol(['end kontrak', 'selesai', 'jatuh tempo']) !== -1 ? findCol(['end kontrak', 'selesai', 'jatuh tempo']) : 17;
+          const colStatus = headers.findIndex((h, i) => i !== colStatusBilling && (h === 'status' || h.startsWith('status')));
+          const finalStatusIdx = colStatus !== -1 ? colStatus : 19;
+          const colDeskripsi = findCol(['deskripsi', 'keterangan']) !== -1 ? findCol(['deskripsi', 'keterangan']) : 20;
+          const colNextAction = findCol(['next action', 'tindakan']) !== -1 ? findCol(['next action', 'tindakan']) : 21;
+          const colDetailUrl = findCol(['detail', 'link dokumen', 'dokumen', 'link', 'url']) !== -1 ? findCol(['detail', 'link dokumen', 'dokumen', 'link', 'url']) : 22;
+
+          appData.procurement = rows.slice(1).map((r, idx) => {
+            const rawId = cleanText(r[colId]);
+            const proker = cleanText(r[colProker]);
+            const task = cleanText(r[colTask]);
+            const vendor = cleanText(r[colVendor]);
+            const cost = parseNum(cleanText(r[colCost]));
+            const kuota = cleanText(r[colKuota]) ? parseNum(cleanText(r[colKuota])) : null;
+            const pemakaian = cleanText(r[colTotalPemakaian]) ? parseNum(cleanText(r[colTotalPemakaian])) : null;
+            
+            let utilisasi = null;
+            const utRaw = cleanText(r[colUtilisasi]);
+            if (utRaw) utilisasi = parseNum(utRaw.replace('%', ''));
+            else if (kuota && pemakaian) utilisasi = Math.round((pemakaian / kuota) * 100);
+
+            const startKontrak = cleanText(r[colStartKontrak]);
+            const endKontrak = (colEndKontrakR !== -1 ? cleanText(r[colEndKontrakR]) : '') || cleanText(r[colEndKontrakFallback]);
+            const status = cleanText(r[finalStatusIdx]) || 'On going';
+
+            let rkf = 'Non-RKF';
+            const rkfRaw = colRkf !== -1 ? cleanText(r[colRkf]).toUpperCase() : '';
+            if (rkfRaw.includes('RKF') || rkfRaw === 'YA' || rkfRaw === '1') rkf = 'RKF';
+
+            const { daysUntilDue, priority } = calculatePaymentPriority(endKontrak, status);
+
+            return {
+              id: rawId || String(idx + 1),
+              namaProker: proker || task || 'Proker / Project',
+              namaTask: task || proker || 'Task / Activity',
+              rkf,
+              tipePengadaan: cleanText(r[colTipePengadaan]) || 'Eksternal',
+              tipeProject: cleanText(r[colTipeProject]) || 'Vendor',
+              vendor: vendor || '-',
+              pic: cleanText(r[colPic]) || 'TBO',
+              cost,
+              kuota,
+              totalPemakaian: pemakaian,
+              utilisasi,
+              startKontrak,
+              endKontrak,
+              jenisAnggaran: cleanText(r[colJenisAnggaran]) || 'OPEX',
+              status,
+              deskripsi: cleanText(r[colDeskripsi]),
+              nextAction: cleanText(r[colNextAction]),
+              detailUrl: cleanUrl(r[colDetailUrl]),
+              daysUntilDue,
+              paymentPriority: priority
+            };
+          }).filter(i => i.namaTask || i.vendor !== '-');
+        }
+
+        // 2. Parse Anggaran
+        if (rAng) {
+          const aLines = rAng.split('\n').filter(l => l.trim().length > 0);
+          if (aLines.length >= 2) {
+            const aRows = aLines.map(parseCSVLine);
+            appData.anggaran = aRows.slice(1).map((r, i) => ({
+              no: cleanText(r[0]) || String(i + 1),
+              produk: cleanText(r[1]) || '-',
+              anggaran: cleanText(r[2]) || 'OPEX',
+              mataAnggaran: cleanText(r[3]) || '-',
+              cost2026: parseNum(cleanText(r[4])),
+              forecastingCost2027: parseNum(cleanText(r[5]))
+            })).filter(a => a.produk !== '-');
+          }
+        }
+
+        // 3. Parse Datamart
+        if (rDm) {
+          const dLines = rDm.split('\n').filter(l => l.trim().length > 0);
+          if (dLines.length >= 2) {
+            const dRows = dLines.map(parseCSVLine);
+            appData.datamart = dRows.slice(1).map((r, i) => ({
+              no: cleanText(r[0]) || String(i + 1),
+              idTiket: cleanText(r[1]) || `DM-${i + 1}`,
+              nama: cleanText(r[2]) || '-',
+              output: cleanText(r[3]) || '-',
+              linkTiket: cleanUrl(r[4]),
+              statusTable: cleanText(r[5]) || '-',
+              keteranganStatus: cleanText(r[6]) || '-'
+            })).filter(d => d.nama !== '-');
+          }
+        }
+
+        onDataLoaded();
+      } catch (err) {
+        console.error("Gagal membaca Google Sheet:", err);
+        document.getElementById('lastUpdatedBadge').innerText = "Gagal memuat Google Sheet. Pastikan akses Sheet bersifat publik (Anyone with link can view).";
+      } finally {
+        if (refreshBtn) refreshBtn.classList.remove('animate-spin');
+      }
+    }
+
+    function onDataLoaded() {
+      document.getElementById('lastUpdatedBadge').innerText = `Sinkronisasi: ${new Date().toLocaleTimeString('id-ID')} WIB (Live Sheet)`;
+      updateProcurementKPI();
+      renderOverviewCards();
+      renderPaymentCards();
+      renderQuotaCards();
+      renderMainTable();
+      renderCharts();
+      renderAnggaranTab();
+      renderDatamartTab();
+      lucide.createIcons();
     }
 
     function switchTab(tabId) {
@@ -644,56 +881,6 @@
       if (['anggaran', 'datamart'].includes(tabId)) procKpi.classList.add('hidden');
       else procKpi.classList.remove('hidden');
 
-      lucide.createIcons();
-    }
-
-    function loadAllData() {
-      const refreshBtn = document.getElementById('refreshBtn');
-      if (refreshBtn) refreshBtn.classList.add('animate-spin');
-
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run
-          .withSuccessHandler(onDataLoaded)
-          .withFailureHandler((err) => {
-            if (refreshBtn) refreshBtn.classList.remove('animate-spin');
-            alert('Gagal memuat data dari Google Sheet: ' + err);
-          })
-          .getAllDashboardData();
-      } else {
-        fetch('/api/sheet-data')
-          .then(r => r.json())
-          .then(res => {
-            onDataLoaded({
-              procurementItems: res.items || [],
-              anggaranItems: res.anggaranItems || [],
-              datamartItems: res.datamartItems || [],
-              lastUpdated: res.lastUpdated || new Date().toLocaleString('id-ID')
-            });
-          })
-          .catch(() => {
-            if (refreshBtn) refreshBtn.classList.remove('animate-spin');
-          });
-      }
-    }
-
-    function onDataLoaded(data) {
-      const refreshBtn = document.getElementById('refreshBtn');
-      if (refreshBtn) refreshBtn.classList.remove('animate-spin');
-
-      appData.procurement = data.procurementItems || [];
-      appData.anggaran = data.anggaranItems || [];
-      appData.datamart = data.datamartItems || [];
-
-      document.getElementById('lastUpdatedBadge').innerText = `Sinkronisasi: ${data.lastUpdated || 'Baru saja'}`;
-
-      updateProcurementKPI();
-      renderOverviewCards();
-      renderPaymentCards();
-      renderQuotaCards();
-      renderMainTable();
-      renderCharts();
-      renderAnggaranTab();
-      renderDatamartTab();
       lucide.createIcons();
     }
 
@@ -1154,38 +1341,8 @@
 
     function submitNewProject(e) {
       e.preventDefault();
-      const saveBtn = document.getElementById('saveProjectBtn');
-      saveBtn.innerText = 'Menyimpan...';
-
-      const newItem = {
-        namaTask: document.getElementById('addNamaTask').value,
-        namaProker: document.getElementById('addNamaProker').value,
-        rkf: document.getElementById('addRkf').value,
-        tipePengadaan: document.getElementById('addTipePengadaan').value,
-        tipeProject: document.getElementById('addTipeProject').value,
-        vendor: document.getElementById('addVendor').value,
-        pic: document.getElementById('addPic').value,
-        cost: document.getElementById('addCost').value,
-        endKontrak: document.getElementById('addEndKontrak').value,
-        detailUrl: document.getElementById('addDetailUrl').value,
-        nextAction: document.getElementById('addNextAction').value
-      };
-
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run
-          .withSuccessHandler(() => {
-            saveBtn.innerText = 'Simpan ke Sheet';
-            closeAddModal();
-            loadAllData();
-          })
-          .addProcurementItem(newItem);
-      } else {
-        setTimeout(() => {
-          saveBtn.innerText = 'Simpan ke Sheet';
-          closeAddModal();
-          alert('Data berhasil disimpan!');
-        }, 500);
-      }
+      alert('Untuk menambah item langsung ke Google Sheet, Anda dapat membukanya langsung di Google Spreadsheet Anda.');
+      closeAddModal();
     }
 
     function openAIModal() {
