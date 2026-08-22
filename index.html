@@ -25,7 +25,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen pb-12 selection:bg-emerald-500 selection:text-white">
 
-  <!-- ================= TOP HEADER BAR ================= -->
+  <!-- TOP HEADER BAR -->
   <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-6 py-3">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
       <div class="flex items-center gap-3">
@@ -62,7 +62,7 @@
     </div>
   </header>
 
-  <!-- ================= MAIN CONTAINER ================= -->
+  <!-- MAIN CONTAINER -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 space-y-4">
 
     <!-- Navigation Tabs -->
@@ -99,7 +99,7 @@
       </div>
     </div>
 
-    <!-- ================= 5 KOLOM KPI SECTION ================= -->
+    <!-- 5 KOLOM KPI SECTION -->
     <section id="procurementKpiSection" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
       
       <!-- 1. Total Nilai Kontrak -->
@@ -163,14 +163,14 @@
           </div>
           <div id="kpiRkfSecondary" class="text-[10px] text-slate-400 mt-0.5 font-mono">
             <span class="text-amber-400 font-bold" id="kpiRkfPending">0 Belum Mulai</span>
-            <span id="kpiRkfDoneWrapper" class="hidden">• <span class="text-emerald-400" id="kpiRkfDone">0 Selesai</span></span>
+            <span id="kpiRkfDoneWrapper" class="hidden">• <span class="text-emerald-400 font-bold" id="kpiRkfDone">0 Selesai</span></span>
           </div>
         </div>
       </div>
 
     </section>
 
-    <!-- ================= TAB 1: OVERVIEW ================= -->
+    <!-- TAB 1: OVERVIEW -->
     <div id="view-overview" class="space-y-4">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <!-- Vendor Cost Chart -->
@@ -228,7 +228,7 @@
       </div>
     </div>
 
-    <!-- ================= TAB 2: PAYMENT DEADLINES ================= -->
+    <!-- TAB 2: PAYMENT DEADLINES -->
     <div id="view-payments" class="hidden space-y-4">
       <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-800">
@@ -251,7 +251,6 @@
           </div>
         </div>
 
-        <!-- SEARCH INPUT DI PAYMENTS DUE TAB -->
         <div class="relative w-full">
           <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400"></i>
           <input 
@@ -267,7 +266,7 @@
       </div>
     </div>
 
-    <!-- ================= TAB 3: QUOTA TRACKER ================= -->
+    <!-- TAB 3: QUOTA TRACKER -->
     <div id="view-quota" class="hidden space-y-4">
       <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
         <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
@@ -281,7 +280,7 @@
       </div>
     </div>
 
-    <!-- ================= TAB 4: PROCUREMENT LEDGER ================= -->
+    <!-- TAB 4: PROCUREMENT LEDGER -->
     <div id="view-table" class="hidden space-y-3">
       <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col md:flex-row gap-2">
         <div class="relative flex-1">
@@ -292,7 +291,7 @@
           <option value="ALL">Semua Status</option>
           <option value="On going">On going</option>
           <option value="Done">Done / Selesai</option>
-          <option value="Not started">Not started</option>
+          <option value="Hold">Hold / Not started</option>
           <option value="Adendum">Adendum</option>
           <option value="Tender">Tender</option>
         </select>
@@ -329,7 +328,7 @@
       </div>
     </div>
 
-    <!-- ================= TAB 5: ANGGARAN ================= -->
+    <!-- TAB 5: ANGGARAN -->
     <div id="view-anggaran" class="hidden space-y-4">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
@@ -386,7 +385,7 @@
       </div>
     </div>
 
-    <!-- ================= TAB 6: REQUEST DATAMART ================= -->
+    <!-- TAB 6: REQUEST DATAMART -->
     <div id="view-datamart" class="hidden space-y-4">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
@@ -441,7 +440,7 @@
 
   </main>
 
-  <!-- ================= MODAL: PROJECT DETAIL ================= -->
+  <!-- MODAL: PROJECT DETAIL -->
   <div id="projectDetailModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="flex items-start justify-between p-4 border-b border-slate-800 bg-slate-950/60">
@@ -504,7 +503,7 @@
     </div>
   </div>
 
-  <!-- ================= MODAL: AI ASSISTANT ================= -->
+  <!-- MODAL: AI ASSISTANT -->
   <div id="aiAssistantModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-950/60">
@@ -527,9 +526,8 @@
     </div>
   </div>
 
-  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <!-- JAVASCRIPT LOGIC -->
   <script>
-    // ID SPREADSHEET GOOGLE ANDA
     const GOOGLE_SHEET_ID = '1MgeRBXOfYrK3aN3sMhodMwxmJjX7OOlRqNYOZ-H3gpA';
 
     let appData = { procurement: [], anggaran: [], datamart: [] };
@@ -619,7 +617,6 @@
       return cleaned || '#';
     }
 
-    // DIRECT FETCH DARI GOOGLE SHEET API
     async function loadAllData() {
       const refreshBtn = document.getElementById('refreshBtn');
       if (refreshBtn) refreshBtn.classList.add('animate-spin');
@@ -657,27 +654,27 @@
           const colProker = findCol(['nama project', 'proker']) !== -1 ? findCol(['nama project', 'proker']) : 1;
           const colTask = findCol(['nama task', 'task']) !== -1 ? findCol(['nama task', 'task']) : 2;
           
-          // Deteksi kolom RKF yang presisi
+          // Kolom RKF (Index 3 di Google Sheet)
           const colRkf = findCol(['rkf', 'status rkf', 'rkf / non-rkf', 'rkf/non', 'kategori rkf']);
           
-          const colTipePengadaan = findCol(['tipe pengadaan']) !== -1 ? findCol(['tipe pengadaan']) : 3;
-          const colTipeProject = findCol(['tipe project']) !== -1 ? findCol(['tipe project']) : 4;
-          const colVendor = findCol(['vendor']) !== -1 ? findCol(['vendor']) : 5;
-          const colPic = findCol(['pic']) !== -1 ? findCol(['pic']) : 6;
-          const colJenisAnggaran = findCol(['jenis anggaran']) !== -1 ? findCol(['jenis anggaran']) : 7;
+          const colTipePengadaan = findCol(['tipe pengadaan']) !== -1 ? findCol(['tipe pengadaan']) : 4;
+          const colTipeProject = findCol(['tipe project']) !== -1 ? findCol(['tipe project']) : 5;
+          const colVendor = findCol(['vendor']) !== -1 ? findCol(['vendor']) : 6;
+          const colPic = findCol(['pic']) !== -1 ? findCol(['pic']) : 7;
+          const colJenisAnggaran = findCol(['jenis anggaran']) !== -1 ? findCol(['jenis anggaran']) : 8;
           const colCost = findCol(['cost', 'biaya', 'nilai']) !== -1 ? findCol(['cost', 'biaya', 'nilai']) : 9;
           const colKuota = findCol(['kuota']) !== -1 ? findCol(['kuota']) : 10;
           const colTotalPemakaian = findCol(['total pemakaian', 'pemakaian']) !== -1 ? findCol(['total pemakaian', 'pemakaian']) : 11;
-          const colUtilisasi = findCol(['utilisasi', 'utlisisasi']) !== -1 ? findCol(['utilisasi', 'utlisisasi']) : 12;
+          const colUtilisasi = findCol(['utlisisasi', 'utilisasi']) !== -1 ? findCol(['utlisisasi', 'utilisasi']) : 12;
           const colStatusBilling = findCol(['status billing']);
-          const colStartKontrak = findCol(['start kontrak', 'mulai']) !== -1 ? findCol(['start kontrak', 'mulai']) : 16;
+          const colStartKontrak = findCol(['start kontrak', 'mulai']) !== -1 ? findCol(['start kontrak', 'mulai']) : 15;
           const colEndKontrakR = headers.findIndex(h => h === 'end kontrak');
-          const colEndKontrakFallback = findCol(['end kontrak', 'selesai', 'jatuh tempo']) !== -1 ? findCol(['end kontrak', 'selesai', 'jatuh tempo']) : 17;
+          const colEndKontrakFallback = findCol(['end kontrak', 'selesai', 'jatuh tempo']) !== -1 ? findCol(['end kontrak', 'selesai', 'jatuh tempo']) : 16;
           const colStatus = headers.findIndex((h, i) => i !== colStatusBilling && (h === 'status' || h.startsWith('status')));
-          const finalStatusIdx = colStatus !== -1 ? colStatus : 19;
-          const colDeskripsi = findCol(['deskripsi', 'keterangan']) !== -1 ? findCol(['deskripsi', 'keterangan']) : 20;
-          const colNextAction = findCol(['next action', 'tindakan']) !== -1 ? findCol(['next action', 'tindakan']) : 21;
-          const colDetailUrl = findCol(['detail', 'link dokumen', 'dokumen', 'link', 'url']) !== -1 ? findCol(['detail', 'link dokumen', 'dokumen', 'link', 'url']) : 22;
+          const finalStatusIdx = colStatus !== -1 ? colStatus : 18;
+          const colDeskripsi = findCol(['deskripsi', 'keterangan']) !== -1 ? findCol(['deskripsi', 'keterangan']) : 19;
+          const colNextAction = findCol(['next action', 'tindakan']) !== -1 ? findCol(['next action', 'tindakan']) : 20;
+          const colDetailUrl = findCol(['detail', 'link dokumen', 'dokumen', 'link', 'url']) !== -1 ? findCol(['detail', 'link dokumen', 'dokumen', 'link', 'url']) : 21;
 
           appData.procurement = rows.slice(1).map((r, idx) => {
             const rawId = cleanText(r[colId]);
@@ -697,7 +694,7 @@
             const endKontrak = (colEndKontrakR !== -1 ? cleanText(r[colEndKontrakR]) : '') || cleanText(r[colEndKontrakFallback]);
             const status = cleanText(r[finalStatusIdx]) || 'On going';
 
-            // PERBAIKAN FILTER RKF VS NON-RKF
+            // DETEKSI RKF VS NON-RKF AKURAT
             let rkf = 'Non-RKF';
             const rkfRaw = (colRkf !== -1 ? cleanText(r[colRkf]) : '').toUpperCase();
             if (rkfRaw.includes('NON') || rkfRaw.includes('BUKAN') || rkfRaw === '-' || rkfRaw === '0' || rkfRaw === 'NO' || rkfRaw === 'TIDAK' || rkfRaw === '') {
@@ -736,7 +733,7 @@
           }).filter(i => (i.namaTask && !i.namaTask.toLowerCase().includes('total')) || i.vendor !== '-');
         }
 
-        // 2. Parse Anggaran
+        // 2. Parse Anggaran Sheet
         if (rAng) {
           const aLines = rAng.split('\n').filter(l => l.trim().length > 0);
           if (aLines.length >= 2) {
@@ -752,7 +749,7 @@
           }
         }
 
-        // 3. Parse Datamart
+        // 3. Parse Datamart Sheet
         if (rDm) {
           const dLines = rDm.split('\n').filter(l => l.trim().length > 0);
           if (dLines.length >= 2) {
@@ -772,7 +769,7 @@
         onDataLoaded();
       } catch (err) {
         console.error("Gagal membaca Google Sheet:", err);
-        document.getElementById('lastUpdatedBadge').innerText = "Gagal memuat Google Sheet. Pastikan akses Sheet bersifat publik (Anyone with link can view).";
+        document.getElementById('lastUpdatedBadge').innerText = "Gagal memuat Google Sheet secara langsung.";
       } finally {
         if (refreshBtn) refreshBtn.classList.remove('animate-spin');
       }
@@ -821,7 +818,7 @@
       document.getElementById('kpiBudgetBreakdown').innerHTML = `<span>OPEX: ${formatRupiah(opexCost)}</span> • <span>CAPEX: ${formatRupiah(capexCost)}</span>`;
       document.getElementById('kpiTotalItems').innerText = `${items.length} Item`;
 
-      // HITUNG RKF DAN NON-RKF DENGAN BENAR
+      // HITUNG RKF (11 Item) & NON-RKF (8 Item)
       const rkfItems = items.filter(i => i.rkf === 'RKF');
       const rkfCount = rkfItems.length;
       const nonRkfCount = items.length - rkfCount;
@@ -830,13 +827,13 @@
       const urgentCount = items.filter(i => i.paymentPriority === 'Urgent').length;
       document.getElementById('kpiUrgentCount').innerText = urgentCount;
 
-      const ongoingCount = items.filter(i => (i.status || '').toLowerCase().includes('on going')).length;
+      const ongoingCount = items.filter(i => (i.status || '').toLowerCase().includes('on going') || (i.status || '').toLowerCase().includes('ongoing')).length;
       document.getElementById('kpiOngoingCount').innerText = ongoingCount;
 
-      // STATUS PROYEK RKF HANYA UNTUK ITEM RKF
+      // STATUS PROYEK RKF (Hanya dari 11 item RKF)
       const rkfOngoing = rkfItems.filter(i => (i.status || '').toLowerCase().includes('on going') || (i.status || '').toLowerCase().includes('ongoing')).length;
       const rkfDone = rkfItems.filter(i => (i.status || '').toLowerCase().includes('done') || (i.status || '').toLowerCase().includes('selesai')).length;
-      const rkfNotStarted = rkfItems.filter(i => (i.status || '').toLowerCase().includes('not started') || (i.status || '').toLowerCase().includes('belum')).length || Math.max(0, rkfCount - rkfOngoing - rkfDone);
+      const rkfNotStarted = rkfItems.filter(i => (i.status || '').toLowerCase().includes('hold') || (i.status || '').toLowerCase().includes('not started') || (i.status || '').toLowerCase().includes('belum')).length || Math.max(0, rkfCount - rkfOngoing - rkfDone);
 
       document.getElementById('kpiRkfOngoing').innerText = rkfOngoing;
       document.getElementById('kpiRkfPending').innerText = `${rkfNotStarted} Belum Mulai`;
@@ -1027,7 +1024,7 @@
               <div class="${isUrgent ? 'text-rose-400 font-bold' : 'text-slate-300'}">Due: ${item.endKontrak || '-'}</div>
             </td>
             <td class="p-3 text-center">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${item.status === 'Done' ? 'bg-emerald-950 text-emerald-300' : 'bg-blue-950 text-blue-300'}">${item.status}</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${item.status === 'Done' ? 'bg-emerald-950 text-emerald-300' : (item.status === 'Hold' ? 'bg-amber-950 text-amber-300' : 'bg-blue-950 text-blue-300')}">${item.status}</span>
             </td>
             <td class="p-3 text-center">
               ${hasUrl ? `
@@ -1092,7 +1089,7 @@
         statusChartInstance = new Chart(sCtx, {
           type: 'doughnut',
           data: {
-            labels: ['On going', 'Selesai / Done', 'Lainnya'],
+            labels: ['On going', 'Selesai / Done', 'Lainnya / Hold'],
             datasets: [{ data: [ongoingCount, doneCount, otherCount], backgroundColor: ['#2563eb', '#059669', '#d97706'], borderWidth: 0 }]
           },
           options: {
