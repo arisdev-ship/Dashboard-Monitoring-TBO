@@ -50,11 +50,6 @@
           <span>AI Insights</span>
         </button>
 
-        <button onclick="openAddModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-bold transition active:scale-95 cursor-pointer">
-          <i data-lucide="plus" class="w-3.5 h-3.5 text-emerald-400"></i>
-          <span>Tambah Item</span>
-        </button>
-
         <button onclick="exportCurrentViewCSV()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-medium transition cursor-pointer" title="Export CSV">
           <i data-lucide="download" class="w-3.5 h-3.5"></i>
           <span class="hidden sm:inline">Export</span>
@@ -126,7 +121,7 @@
           <div class="p-1.5 rounded-lg bg-blue-950/80 text-blue-400"><i data-lucide="layers" class="w-4 h-4"></i></div>
         </div>
         <div class="my-1">
-          <div id="kpiTotalItems" class="text-base sm:text-lg font-bold font-mono text-white">0</div>
+          <div id="kpiTotalItems" class="text-base sm:text-lg font-bold font-mono text-white">0 Item</div>
           <div id="kpiRkfBreakdown" class="text-[10px] text-emerald-400 font-mono font-bold mt-0.5">RKF: 0 • Non-RKF: 0</div>
         </div>
       </div>
@@ -509,84 +504,6 @@
     </div>
   </div>
 
-  <!-- ================= MODAL: TAMBAH ITEM ================= -->
-  <div id="addProjectModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 hidden">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
-      <div class="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-950/60">
-        <div class="flex items-center gap-2">
-          <i data-lucide="plus-circle" class="w-5 h-5 text-emerald-400"></i>
-          <h3 class="text-sm font-bold text-white">Tambah Item Pengadaan / Task Baru</h3>
-        </div>
-        <button onclick="closeAddModal()" class="p-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
-      </div>
-      <form id="addProjectForm" onsubmit="submitNewProject(event)" class="p-4 overflow-y-auto space-y-3 custom-scrollbar text-xs">
-        <div>
-          <label class="block text-slate-400 font-medium mb-1">Nama Task / Proyek *</label>
-          <input type="text" id="addNamaTask" required placeholder="Contoh: Pengembangan Fitur Payment Gateway" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden focus:border-emerald-500">
-        </div>
-        <div>
-          <label class="block text-slate-400 font-medium mb-1">Program Kerja (Proker) Utama</label>
-          <input type="text" id="addNamaProker" placeholder="Contoh: Peningkatan Transaksi Digital" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
-        </div>
-        <div class="grid grid-cols-3 gap-2">
-          <div>
-            <label class="block text-slate-400 font-medium mb-1">Kategori RKF</label>
-            <select id="addRkf" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
-              <option value="RKF">RKF</option>
-              <option value="Non-RKF">Non-RKF</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-slate-400 font-medium mb-1">Tipe</label>
-            <select id="addTipePengadaan" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
-              <option value="Eksternal">Eksternal</option>
-              <option value="Internal">Internal</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-slate-400 font-medium mb-1">Project</label>
-            <select id="addTipeProject" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
-              <option value="Vendor">Vendor</option>
-              <option value="Internal">Internal</option>
-            </select>
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-slate-400 font-medium mb-1">Vendor</label>
-            <input type="text" id="addVendor" placeholder="PT Solusi Mitra" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
-          </div>
-          <div>
-            <label class="block text-slate-400 font-medium mb-1">PIC Unit Kerja</label>
-            <input type="text" id="addPic" value="SAPTI" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-2">
-          <div>
-            <label class="block text-slate-400 font-medium mb-1">Nilai Kontrak (Rp)</label>
-            <input type="number" id="addCost" placeholder="0" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
-          </div>
-          <div>
-            <label class="block text-slate-400 font-medium mb-1">End Kontrak (Due Date)</label>
-            <input type="text" id="addEndKontrak" placeholder="31 Des 2026" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
-          </div>
-        </div>
-        <div>
-          <label class="block text-slate-400 font-medium mb-1">Link Dokumen / URL Detail</label>
-          <input type="text" id="addDetailUrl" placeholder="https://drive.google.com/..." class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
-        </div>
-        <div>
-          <label class="block text-slate-400 font-medium mb-1">Next Action</label>
-          <input type="text" id="addNextAction" placeholder="Pengajuan SPK / Nota Dinas" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
-        </div>
-        <div class="pt-2 flex justify-end gap-2 border-t border-slate-800">
-          <button type="button" onclick="closeAddModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold cursor-pointer">Batal</button>
-          <button type="submit" id="saveProjectBtn" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold transition cursor-pointer">Simpan ke Sheet</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <!-- ================= MODAL: AI ASSISTANT ================= -->
   <div id="aiAssistantModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
@@ -610,7 +527,7 @@
     </div>
   </div>
 
-  <!-- ================= JAVASCRIPT LOGIC (DIRECT GOOGLE SHEET SYNC) ================= -->
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
   <script>
     // ID SPREADSHEET GOOGLE ANDA
     const GOOGLE_SHEET_ID = '1MgeRBXOfYrK3aN3sMhodMwxmJjX7OOlRqNYOZ-H3gpA';
@@ -702,7 +619,7 @@
       return cleaned || '#';
     }
 
-    // DIRECT FETCH DARI GOOGLE SHEET API (KOMPATIBEL DENGAN VERCEL & GITHUB)
+    // DIRECT FETCH DARI GOOGLE SHEET API
     async function loadAllData() {
       const refreshBtn = document.getElementById('refreshBtn');
       if (refreshBtn) refreshBtn.classList.add('animate-spin');
@@ -739,7 +656,10 @@
           const colId = findCol(['id']) !== -1 ? findCol(['id']) : 0;
           const colProker = findCol(['nama project', 'proker']) !== -1 ? findCol(['nama project', 'proker']) : 1;
           const colTask = findCol(['nama task', 'task']) !== -1 ? findCol(['nama task', 'task']) : 2;
-          const colRkf = findCol(['rkf', 'status rkf', 'rkf / non-rkf', 'kategori rkf']);
+          
+          // Deteksi kolom RKF yang presisi
+          const colRkf = findCol(['rkf', 'status rkf', 'rkf / non-rkf', 'rkf/non', 'kategori rkf']);
+          
           const colTipePengadaan = findCol(['tipe pengadaan']) !== -1 ? findCol(['tipe pengadaan']) : 3;
           const colTipeProject = findCol(['tipe project']) !== -1 ? findCol(['tipe project']) : 4;
           const colVendor = findCol(['vendor']) !== -1 ? findCol(['vendor']) : 5;
@@ -777,9 +697,16 @@
             const endKontrak = (colEndKontrakR !== -1 ? cleanText(r[colEndKontrakR]) : '') || cleanText(r[colEndKontrakFallback]);
             const status = cleanText(r[finalStatusIdx]) || 'On going';
 
+            // PERBAIKAN FILTER RKF VS NON-RKF
             let rkf = 'Non-RKF';
-            const rkfRaw = colRkf !== -1 ? cleanText(r[colRkf]).toUpperCase() : '';
-            if (rkfRaw.includes('RKF') || rkfRaw === 'YA' || rkfRaw === '1') rkf = 'RKF';
+            const rkfRaw = (colRkf !== -1 ? cleanText(r[colRkf]) : '').toUpperCase();
+            if (rkfRaw.includes('NON') || rkfRaw.includes('BUKAN') || rkfRaw === '-' || rkfRaw === '0' || rkfRaw === 'NO' || rkfRaw === 'TIDAK' || rkfRaw === '') {
+              rkf = 'Non-RKF';
+            } else if (rkfRaw.includes('RKF') || rkfRaw === 'YA' || rkfRaw === 'YES' || rkfRaw === '1') {
+              rkf = 'RKF';
+            } else {
+              rkf = 'Non-RKF';
+            }
 
             const { daysUntilDue, priority } = calculatePaymentPriority(endKontrak, status);
 
@@ -806,7 +733,7 @@
               daysUntilDue,
               paymentPriority: priority
             };
-          }).filter(i => i.namaTask || i.vendor !== '-');
+          }).filter(i => (i.namaTask && !i.namaTask.toLowerCase().includes('total')) || i.vendor !== '-');
         }
 
         // 2. Parse Anggaran
@@ -894,7 +821,8 @@
       document.getElementById('kpiBudgetBreakdown').innerHTML = `<span>OPEX: ${formatRupiah(opexCost)}</span> • <span>CAPEX: ${formatRupiah(capexCost)}</span>`;
       document.getElementById('kpiTotalItems').innerText = `${items.length} Item`;
 
-      const rkfItems = items.filter(i => (i.rkf || '').toUpperCase() === 'RKF');
+      // HITUNG RKF DAN NON-RKF DENGAN BENAR
+      const rkfItems = items.filter(i => i.rkf === 'RKF');
       const rkfCount = rkfItems.length;
       const nonRkfCount = items.length - rkfCount;
       document.getElementById('kpiRkfBreakdown').innerText = `RKF: ${rkfCount} • Non-RKF: ${nonRkfCount}`;
@@ -905,10 +833,10 @@
       const ongoingCount = items.filter(i => (i.status || '').toLowerCase().includes('on going')).length;
       document.getElementById('kpiOngoingCount').innerText = ongoingCount;
 
-      // 5. STATUS PROYEK RKF
+      // STATUS PROYEK RKF HANYA UNTUK ITEM RKF
       const rkfOngoing = rkfItems.filter(i => (i.status || '').toLowerCase().includes('on going') || (i.status || '').toLowerCase().includes('ongoing')).length;
       const rkfDone = rkfItems.filter(i => (i.status || '').toLowerCase().includes('done') || (i.status || '').toLowerCase().includes('selesai')).length;
-      const rkfNotStarted = rkfCount - rkfOngoing - rkfDone;
+      const rkfNotStarted = rkfItems.filter(i => (i.status || '').toLowerCase().includes('not started') || (i.status || '').toLowerCase().includes('belum')).length || Math.max(0, rkfCount - rkfOngoing - rkfDone);
 
       document.getElementById('kpiRkfOngoing').innerText = rkfOngoing;
       document.getElementById('kpiRkfPending').innerText = `${rkfNotStarted} Belum Mulai`;
@@ -925,7 +853,7 @@
     function getCardHtml(item) {
       const isUrgent = item.paymentPriority === 'Urgent';
       const isUpcoming = item.paymentPriority === 'Upcoming';
-      const isRkf = (item.rkf || '').toUpperCase() === 'RKF';
+      const isRkf = item.rkf === 'RKF';
       const borderClass = isUrgent ? 'border-l-4 border-l-rose-500 bg-rose-950/10' : (isUpcoming ? 'border-l-4 border-l-amber-500 bg-amber-950/10' : 'border-l-4 border-l-emerald-500');
 
       return `
@@ -995,7 +923,7 @@
           (item.pic && item.pic.toLowerCase().includes(search)) ||
           (item.rkf && item.rkf.toLowerCase().includes(search));
 
-        const matchRkf = activeCardFilters.rkf === 'ALL' || (item.rkf || '').toUpperCase() === activeCardFilters.rkf.toUpperCase();
+        const matchRkf = activeCardFilters.rkf === 'ALL' || item.rkf === activeCardFilters.rkf;
         const matchPri = activeCardFilters.priority === 'ALL' || item.paymentPriority === activeCardFilters.priority;
         return matchSearch && matchRkf && matchPri;
       });
@@ -1060,7 +988,7 @@
           (item.pic && item.pic.toLowerCase().includes(search));
 
         const matchStatus = statusFilter === 'ALL' || (item.status && item.status.toLowerCase().includes(statusFilter.toLowerCase()));
-        const matchRkf = rkfFilter === 'ALL' || (item.rkf || '').toUpperCase() === rkfFilter.toUpperCase();
+        const matchRkf = rkfFilter === 'ALL' || item.rkf === rkfFilter;
         return matchSearch && matchStatus && matchRkf;
       });
 
@@ -1076,7 +1004,7 @@
       tbody.innerHTML = filtered.map(item => {
         const isUrgent = item.paymentPriority === 'Urgent';
         const hasUrl = item.detailUrl && item.detailUrl !== '#';
-        const isRkf = (item.rkf || '').toUpperCase() === 'RKF';
+        const isRkf = item.rkf === 'RKF';
 
         return `
           <tr class="hover:bg-slate-800/40 transition">
@@ -1085,8 +1013,8 @@
               <div class="font-bold text-slate-100 line-clamp-1">${item.namaTask}</div>
               <div class="text-[10px] text-slate-400 line-clamp-1">${item.namaProker}</div>
               <div class="flex gap-1 mt-1">
-                <span class="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded ${isRkf ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-slate-800 text-slate-400 border border-slate-700'}">${item.rkf || 'Non-RKF'}</span>
-                <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">${item.tipePengadaan}</span>
+                <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded ${isRkf ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-slate-800 text-slate-400 border border-slate-700'}">${item.rkf}</span>
+                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">${item.tipePengadaan}</span>
               </div>
             </td>
             <td class="p-3">
@@ -1306,9 +1234,9 @@
       const item = appData.procurement.find(i => String(i.id) === String(id));
       if (!item) return;
       
-      const isRkf = (item.rkf || '').toUpperCase() === 'RKF';
+      const isRkf = item.rkf === 'RKF';
       const rkfPill = document.getElementById('modalRkfPill');
-      rkfPill.innerText = item.rkf || 'Non-RKF';
+      rkfPill.innerText = item.rkf;
       rkfPill.className = `px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border ${isRkf ? 'bg-emerald-950 text-emerald-300 border-emerald-800' : 'bg-slate-800 text-slate-300 border-slate-700'}`;
 
       document.getElementById('modalTipePill').innerText = `${item.tipePengadaan} • ${item.tipeProject}`;
@@ -1334,15 +1262,6 @@
         document.getElementById('modalCopyText').innerText = 'Tersalin!';
         setTimeout(() => { document.getElementById('modalCopyText').innerText = 'Salin URL'; }, 2000);
       }
-    }
-
-    function openAddModal() { document.getElementById('addProjectModal').classList.remove('hidden'); }
-    function closeAddModal() { document.getElementById('addProjectModal').classList.add('hidden'); }
-
-    function submitNewProject(e) {
-      e.preventDefault();
-      alert('Untuk menambah item langsung ke Google Sheet, Anda dapat membukanya langsung di Google Spreadsheet Anda.');
-      closeAddModal();
     }
 
     function openAIModal() {
