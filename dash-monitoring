@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Executive Procurement & Datamart Dashboard</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-12 selection:bg-emerald-500 selection:text-white">
+
+  <!-- ================= TOP HEADER BAR ================= -->
+  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-6 py-3">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-900/30 shrink-0">
+          <i data-lucide="layout-dashboard" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm sm:text-base font-bold text-white tracking-tight">Executive Procurement & Datamart Dashboard</h1>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              LIVE SHEET
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-400">Monitoring Kontrak Vendor, Alokasi Anggaran OPEX/CAPEX, & Request Datamart</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="openAIModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold shadow-md shadow-emerald-950/40 transition active:scale-95 cursor-pointer">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          <span>AI Insights</span>
+        </button>
+
+        <button onclick="openAddModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-bold transition active:scale-95 cursor-pointer">
+          <i data-lucide="plus" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span>Tambah Item</span>
+        </button>
+
+        <button onclick="exportCurrentViewCSV()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-medium transition cursor-pointer" title="Export CSV">
+          <i data-lucide="download" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">Export</span>
+        </button>
+
+        <button onclick="loadAllData()" id="refreshBtn" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition cursor-pointer" title="Refresh Data">
+          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 space-y-4">
+
+    <!-- Navigation Tabs -->
+    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
+      <div class="flex flex-wrap items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+        <button onclick="switchTab('overview')" id="tab-overview" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition bg-emerald-600 text-white shadow-xs">
+          <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
+          <span>Overview</span>
+        </button>
+        <button onclick="switchTab('payments')" id="tab-payments" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
+          <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+          <span>Payment Deadlines</span>
+        </button>
+        <button onclick="switchTab('quota')" id="tab-quota" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
+          <i data-lucide="database" class="w-3.5 h-3.5"></i>
+          <span>Quota Tracker</span>
+        </button>
+        <button onclick="switchTab('table')" id="tab-table" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
+          <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
+          <span>Procurement Ledger</span>
+        </button>
+        <button onclick="switchTab('anggaran')" id="tab-anggaran" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
+          <i data-lucide="dollar-sign" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span>Anggaran</span>
+        </button>
+        <button onclick="switchTab('datamart')" id="tab-datamart" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
+          <i data-lucide="folder-git-2" class="w-3.5 h-3.5 text-blue-400"></i>
+          <span>Request Datamart</span>
+        </button>
+      </div>
+
+      <div id="lastUpdatedBadge" class="text-[11px] text-slate-500 font-mono hidden md:block">
+        Sinkronisasi: Memuat...
+      </div>
+    </div>
+
+    <!-- ================= 5 KOLOM KPI SECTION ================= -->
+    <section id="procurementKpiSection" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+      
+      <!-- 1. Total Nilai Kontrak -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 flex flex-col justify-between shadow-xs">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-slate-400 uppercase">Total Nilai Kontrak</span>
+          <div class="p-1.5 rounded-lg bg-emerald-950/80 text-emerald-400"><i data-lucide="dollar-sign" class="w-4 h-4"></i></div>
+        </div>
+        <div class="my-1">
+          <div id="kpiTotalCost" class="text-base sm:text-lg font-bold font-mono text-white">Rp 0</div>
+          <div id="kpiBudgetBreakdown" class="text-[10px] text-slate-400 mt-0.5 flex gap-1.5 font-mono"><span>OPEX: -</span> • <span>CAPEX: -</span></div>
+        </div>
+      </div>
+
+      <!-- 2. Total Item Pengadaan -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 flex flex-col justify-between shadow-xs">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-slate-400 uppercase">Total Item Pengadaan</span>
+          <div class="p-1.5 rounded-lg bg-blue-950/80 text-blue-400"><i data-lucide="layers" class="w-4 h-4"></i></div>
+        </div>
+        <div class="my-1">
+          <div id="kpiTotalItems" class="text-base sm:text-lg font-bold font-mono text-white">0</div>
+          <div id="kpiRkfBreakdown" class="text-[10px] text-emerald-400 font-mono font-bold mt-0.5">RKF: 0 • Non-RKF: 0</div>
+        </div>
+      </div>
+
+      <!-- 3. Jatuh Tempo Urgent -->
+      <div onclick="filterByPriority('Urgent')" class="bg-slate-900/90 border border-rose-900/40 hover:border-rose-700/80 rounded-2xl p-3.5 flex flex-col justify-between shadow-xs cursor-pointer transition group">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-rose-400 uppercase">Jatuh Tempo Urgent</span>
+          <div class="p-1.5 rounded-lg bg-rose-950 text-rose-400 group-hover:scale-110 transition"><i data-lucide="alert-triangle" class="w-4 h-4"></i></div>
+        </div>
+        <div class="my-1">
+          <div id="kpiUrgentCount" class="text-base sm:text-lg font-bold font-mono text-rose-400">0</div>
+          <div class="text-[10px] text-rose-400/80 mt-0.5">≤30 hari / perlu SPK & Adendum</div>
+        </div>
+      </div>
+
+      <!-- 4. Status On Going -->
+      <div onclick="filterByStatus('On going')" class="bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-2xl p-3.5 flex flex-col justify-between shadow-xs cursor-pointer transition">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-slate-400 uppercase">Status On going</span>
+          <div class="p-1.5 rounded-lg bg-indigo-950/80 text-indigo-400"><i data-lucide="clock" class="w-4 h-4"></i></div>
+        </div>
+        <div class="my-1">
+          <div id="kpiOngoingCount" class="text-base sm:text-lg font-bold font-mono text-indigo-300">0</div>
+          <div class="text-[10px] text-slate-400 mt-0.5">Sedang dalam pelaksanaan</div>
+        </div>
+      </div>
+
+      <!-- 5. Status Proyek RKF -->
+      <div onclick="filterByRkfOnly()" class="bg-slate-900/90 border border-emerald-900/40 hover:border-emerald-700/80 rounded-2xl p-3.5 flex flex-col justify-between shadow-xs cursor-pointer transition group">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-emerald-400 uppercase">Status Proyek RKF</span>
+          <div class="p-1.5 rounded-lg bg-emerald-950 text-emerald-400 group-hover:scale-110 transition"><i data-lucide="target" class="w-4 h-4"></i></div>
+        </div>
+        <div class="my-1">
+          <div class="flex items-baseline gap-1.5">
+            <span id="kpiRkfOngoing" class="text-base sm:text-lg font-bold font-mono text-emerald-300">0</span>
+            <span class="text-xs font-medium text-slate-400">Berjalan</span>
+          </div>
+          <div id="kpiRkfSecondary" class="text-[10px] text-slate-400 mt-0.5 font-mono">
+            <span class="text-amber-400 font-bold" id="kpiRkfPending">0 Belum Mulai</span>
+            <span id="kpiRkfDoneWrapper" class="hidden">• <span class="text-emerald-400" id="kpiRkfDone">0 Selesai</span></span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= TAB 1: OVERVIEW ================= -->
+    <div id="view-overview" class="space-y-4">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Vendor Cost Chart -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
+          <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+            <div>
+              <h3 class="text-xs font-bold text-slate-200 uppercase tracking-tight">Alokasi Budgeting per Vendor</h3>
+              <p class="text-[10px] text-slate-400">Total nilai kontrak SPK per vendor mitra</p>
+            </div>
+            <span class="px-2 py-0.5 text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-md">BAR CHART</span>
+          </div>
+          <div class="h-60 relative"><canvas id="vendorChart"></canvas></div>
+        </div>
+
+        <!-- Status Breakdown Chart -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
+          <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+            <div>
+              <h3 class="text-xs font-bold text-slate-200 uppercase tracking-tight">Proporsi Status Pelaksanaan Proyek</h3>
+              <p class="text-[10px] text-slate-400">Persentase progres seluruh proyek</p>
+            </div>
+            <span class="px-2 py-0.5 text-[10px] font-mono font-bold bg-blue-500/10 text-blue-400 border border-blue-500/30 rounded-md">PIE CHART</span>
+          </div>
+          <div class="h-60 relative flex items-center justify-center"><canvas id="statusChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Quick Deadline Section with SEARCH FIELD -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
+          <div>
+            <h3 class="text-xs font-bold text-white uppercase tracking-tight">Critical Payment Deadlines & Schedule Kontrak</h3>
+            <p class="text-[11px] text-slate-400">Pantau jatuh tempo dan link dokumen pendukung</p>
+          </div>
+          <button onclick="switchTab('payments')" class="text-xs font-bold text-emerald-400 hover:underline inline-flex items-center gap-1 cursor-pointer">
+            <span>Lihat Semua Jadwal</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+
+        <!-- SEARCH INPUT DI OVERVIEW -->
+        <div class="relative w-full">
+          <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400"></i>
+          <input 
+            type="text" 
+            id="overviewSearchInput" 
+            oninput="renderOverviewCards()" 
+            placeholder="Cari jadwal pembayaran berdasarkan vendor, task, proker, PIC..." 
+            class="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-emerald-500 transition"
+          >
+        </div>
+
+        <!-- Cards Grid -->
+        <div id="overviewCardsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1"></div>
+      </div>
+    </div>
+
+    <!-- ================= TAB 2: PAYMENT DEADLINES ================= -->
+    <div id="view-payments" class="hidden space-y-4">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+          <div>
+            <h2 class="text-sm font-bold text-white uppercase tracking-tight">Schedule & Prioritas Jatuh Tempo Pembayaran</h2>
+            <p class="text-[11px] text-slate-400">Monitoring verifikasi BAST, SPK, dan link dokumen penagihan</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="flex items-center bg-slate-800 p-0.5 rounded-lg border border-slate-700 text-[10px] font-mono font-bold">
+              <button onclick="setCardFilter('rkf', 'ALL')" id="rf-all" class="px-2 py-1 rounded bg-white text-slate-950 shadow-xs">ALL</button>
+              <button onclick="setCardFilter('rkf', 'RKF')" id="rf-rkf" class="px-2 py-1 rounded text-slate-400 hover:text-white">RKF</button>
+              <button onclick="setCardFilter('rkf', 'Non-RKF')" id="rf-non" class="px-2 py-1 rounded text-slate-400 hover:text-white">NON-RKF</button>
+            </div>
+            <div class="flex items-center bg-slate-800 p-0.5 rounded-lg border border-slate-700 text-[10px] font-mono font-bold">
+              <button onclick="setCardFilter('priority', 'ALL')" id="pf-all" class="px-2.5 py-1 rounded bg-white text-slate-950 shadow-xs">SEMUA</button>
+              <button onclick="setCardFilter('priority', 'Urgent')" id="pf-urg" class="px-2.5 py-1 rounded text-rose-400 hover:bg-rose-950/40">URGENT</button>
+              <button onclick="setCardFilter('priority', 'Upcoming')" id="pf-upc" class="px-2.5 py-1 rounded text-amber-400 hover:bg-amber-950/40">SOON</button>
+              <button onclick="setCardFilter('priority', 'Safe')" id="pf-saf" class="px-2.5 py-1 rounded text-emerald-400 hover:bg-emerald-950/40">SAFE</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEARCH INPUT DI PAYMENTS DUE TAB -->
+        <div class="relative w-full">
+          <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400"></i>
+          <input 
+            type="text" 
+            id="paymentsSearchInput" 
+            oninput="renderPaymentCards()" 
+            placeholder="Cari nama proker, task, vendor, PIC, RKF..." 
+            class="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-emerald-500 transition"
+          >
+        </div>
+
+        <div id="paymentCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-1"></div>
+      </div>
+    </div>
+
+    <!-- ================= TAB 3: QUOTA TRACKER ================= -->
+    <div id="view-quota" class="hidden space-y-4">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
+          <div>
+            <h2 class="text-sm font-bold text-white uppercase tracking-tight">3rd Party API Service Quota & Usage</h2>
+            <p class="text-[11px] text-slate-400">Monitoring kuota OCR KTP, Liveness, Face Compare, & Gateway</p>
+          </div>
+          <span class="px-2.5 py-0.5 text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-md uppercase">QUOTA MONITOR</span>
+        </div>
+        <div id="quotaCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+      </div>
+    </div>
+
+    <!-- ================= TAB 4: PROCUREMENT LEDGER ================= -->
+    <div id="view-table" class="hidden space-y-3">
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col md:flex-row gap-2">
+        <div class="relative flex-1">
+          <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400"></i>
+          <input type="text" id="tableSearchInput" oninput="renderMainTable()" placeholder="Cari nama proker, task, vendor, PIC..." class="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-emerald-500">
+        </div>
+        <select id="tableStatusFilter" onchange="renderMainTable()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-hidden">
+          <option value="ALL">Semua Status</option>
+          <option value="On going">On going</option>
+          <option value="Done">Done / Selesai</option>
+          <option value="Not started">Not started</option>
+          <option value="Adendum">Adendum</option>
+          <option value="Tender">Tender</option>
+        </select>
+        <select id="tableRkfFilter" onchange="renderMainTable()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-hidden">
+          <option value="ALL">Semua Tipe RKF</option>
+          <option value="RKF">Hanya RKF</option>
+          <option value="Non-RKF">Hanya Non-RKF</option>
+        </select>
+      </div>
+
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-950/80 border-b border-slate-800 text-slate-400 uppercase text-[10px] font-bold sticky top-0">
+              <tr>
+                <th class="p-3 w-10 text-center">ID</th>
+                <th class="p-3">Project / Task</th>
+                <th class="p-3">Vendor & PIC</th>
+                <th class="p-3 text-right">Nilai Kontrak</th>
+                <th class="p-3">Schedule</th>
+                <th class="p-3 text-center">Status</th>
+                <th class="p-3 text-center">Dokumen</th>
+                <th class="p-3">Next Action</th>
+                <th class="p-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="mainTableBody" class="divide-y divide-slate-800/60"></tbody>
+          </table>
+        </div>
+        <div class="p-3 bg-slate-950/60 border-t border-slate-800 flex items-center justify-between text-[11px] font-mono text-slate-400">
+          <span id="tableCountInfo">Memuat...</span>
+          <span>LIVE PROCUREMENT LEDGER</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= TAB 5: ANGGARAN ================= -->
+    <div id="view-anggaran" class="hidden space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <span class="text-[11px] font-bold text-slate-400 uppercase">Total Anggaran 2026</span>
+          <div id="kpiAng2026" class="text-xl font-bold font-mono text-emerald-400 mt-1">Rp 0</div>
+          <div id="kpiAngOpexCapex" class="text-[10px] text-slate-500 font-mono mt-1">OPEX: - • CAPEX: -</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <span class="text-[11px] font-bold text-slate-400 uppercase">Forecasting Cost 2027</span>
+          <div id="kpiAng2027" class="text-xl font-bold font-mono text-blue-400 mt-1">Rp 0</div>
+          <div class="text-[10px] text-slate-500 font-mono mt-1">Estimasi Kebutuhan Biaya</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <span class="text-[11px] font-bold text-slate-400 uppercase">Kenaikan / Growth</span>
+          <div id="kpiAngGrowth" class="text-xl font-bold font-mono text-purple-400 mt-1">+0.0%</div>
+          <div id="kpiAngDiff" class="text-[10px] text-slate-500 font-mono mt-1">Selisih: +Rp 0</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <span class="text-[11px] font-bold text-slate-400 uppercase">Total Item Anggaran</span>
+          <div id="kpiAngTotalItems" class="text-xl font-bold font-mono text-white mt-1">0 Item</div>
+          <div class="text-[10px] text-slate-500 font-mono mt-1">Pekerjaan / Brand IT</div>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col md:flex-row items-center justify-between gap-3">
+        <div class="relative flex-1 w-full">
+          <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400"></i>
+          <input type="text" id="anggaranSearchInput" oninput="renderAnggaranTable()" placeholder="Cari produk, brand, mata anggaran..." class="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-emerald-500">
+        </div>
+        <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px] font-mono font-bold">
+          <button onclick="setAnggaranFilter('ALL')" id="af-all" class="px-3 py-1 rounded-lg bg-emerald-600 text-white shadow-2xs">SEMUA</button>
+          <button onclick="setAnggaranFilter('OPEX')" id="af-opex" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white">OPEX</button>
+          <button onclick="setAnggaranFilter('CAPEX')" id="af-capex" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white">CAPEX</button>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-950/80 border-b border-slate-800 text-slate-400 uppercase text-[10px] font-bold">
+              <tr>
+                <th class="p-3 w-12 text-center">No</th>
+                <th class="p-3">Produk / Brand / Pekerjaan</th>
+                <th class="p-3 text-center">Tipe Anggaran</th>
+                <th class="p-3 text-center">Mata Anggaran</th>
+                <th class="p-3 text-right">Cost 2026</th>
+                <th class="p-3 text-right">Forecasting Cost 2027</th>
+                <th class="p-3 text-center">Estimasi Pertumbuhan</th>
+              </tr>
+            </thead>
+            <tbody id="anggaranTableBody" class="divide-y divide-slate-800/60 font-sans"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= TAB 6: REQUEST DATAMART ================= -->
+    <div id="view-datamart" class="hidden space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <span class="text-[11px] font-bold text-slate-400 uppercase">Total Request Datamart</span>
+          <div id="kpiDmTotal" class="text-xl font-bold font-mono text-white mt-1">0 Tiket</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <span class="text-[11px] font-bold text-emerald-400 uppercase">Done & Table Ready</span>
+          <div id="kpiDmDone" class="text-xl font-bold font-mono text-emerald-400 mt-1">0 Table</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <span class="text-[11px] font-bold text-amber-400 uppercase">On going / Review</span>
+          <div id="kpiDmProgress" class="text-xl font-bold font-mono text-amber-400 mt-1">0 Tiket</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <span class="text-[11px] font-bold text-rose-400 uppercase">Rejected / Revisi</span>
+          <div id="kpiDmRejected" class="text-xl font-bold font-mono text-rose-400 mt-1">0 Tiket</div>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col md:flex-row items-center justify-between gap-3">
+        <div class="relative flex-1 w-full">
+          <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400"></i>
+          <input type="text" id="datamartSearchInput" oninput="renderDatamartTable()" placeholder="Cari ID tiket, nama permintaan, table datamart..." class="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-emerald-500">
+        </div>
+        <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px] font-mono font-bold">
+          <button onclick="setDatamartFilter('ALL')" id="df-all" class="px-3 py-1 rounded-lg bg-emerald-600 text-white">ALL</button>
+          <button onclick="setDatamartFilter('DONE')" id="df-done" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white">DONE</button>
+          <button onclick="setDatamartFilter('IN_PROGRESS')" id="df-prog" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white">PROGRESS</button>
+          <button onclick="setDatamartFilter('REJECTED')" id="df-rej" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white">REJECTED</button>
+        </div>
+      </div>
+
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-950/80 border-b border-slate-800 text-slate-400 uppercase text-[10px] font-bold">
+              <tr>
+                <th class="p-3 w-10 text-center">No</th>
+                <th class="p-3 text-center w-28">ID Tiket</th>
+                <th class="p-3">Nama Permintaan & Output</th>
+                <th class="p-3 text-center">Service Desk</th>
+                <th class="p-3">Status / Table Datamart BigQuery</th>
+                <th class="p-3">Keterangan Status</th>
+              </tr>
+            </thead>
+            <tbody id="datamartTableBody" class="divide-y divide-slate-800/60 font-sans"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= MODAL: PROJECT DETAIL ================= -->
+  <div id="projectDetailModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="flex items-start justify-between p-4 border-b border-slate-800 bg-slate-950/60">
+        <div>
+          <div class="flex items-center gap-2">
+            <span id="modalRkfPill" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border bg-emerald-950 text-emerald-300 border-emerald-800">RKF</span>
+            <span id="modalTipePill" class="text-[10px] font-mono font-bold text-slate-400 uppercase">Eksternal • Vendor</span>
+          </div>
+          <h3 id="modalTaskName" class="text-base font-bold text-white mt-1">Nama Proyek</h3>
+          <p id="modalProkerName" class="text-xs text-slate-400">Proker: -</p>
+        </div>
+        <button onclick="closeDetailModal()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="p-4 overflow-y-auto space-y-3 custom-scrollbar text-xs">
+        <div class="grid grid-cols-2 gap-2 font-mono">
+          <div class="p-2.5 bg-slate-950/70 border border-slate-800 rounded-xl">
+            <span class="text-[10px] text-slate-500 font-bold uppercase">Vendor / Mitra</span>
+            <div id="modalVendor" class="font-bold text-slate-200 mt-0.5">-</div>
+          </div>
+          <div class="p-2.5 bg-slate-950/70 border border-slate-800 rounded-xl">
+            <span class="text-[10px] text-slate-500 font-bold uppercase">PIC Unit Kerja</span>
+            <div id="modalPic" class="font-bold text-slate-200 mt-0.5">-</div>
+          </div>
+          <div class="p-2.5 bg-slate-950/70 border border-slate-800 rounded-xl">
+            <span class="text-[10px] text-slate-500 font-bold uppercase">Nilai Kontrak (Cost)</span>
+            <div id="modalCost" class="font-bold text-emerald-400 mt-0.5">Rp 0</div>
+          </div>
+          <div class="p-2.5 bg-slate-950/70 border border-slate-800 rounded-xl">
+            <span class="text-[10px] text-slate-500 font-bold uppercase">Jatuh Tempo (End Kontrak)</span>
+            <div id="modalDueDate" class="font-bold text-rose-400 mt-0.5">-</div>
+          </div>
+        </div>
+        <div class="p-3 bg-slate-950/80 border border-slate-800 rounded-xl space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5 text-slate-300 font-bold"><i data-lucide="file-text" class="w-4 h-4 text-emerald-400"></i><span>Dokumen / Lampiran Proyek</span></div>
+            <div class="flex items-center gap-1.5">
+              <button id="modalCopyBtn" onclick="copyModalLink()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px] font-bold flex items-center gap-1 cursor-pointer">
+                <i data-lucide="copy" class="w-3 h-3"></i>
+                <span id="modalCopyText">Salin URL</span>
+              </button>
+              <a id="modalOpenDocBtn" href="#" target="_blank" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold flex items-center gap-1 cursor-pointer">
+                <span>Buka Link</span><i data-lucide="external-link" class="w-3 h-3"></i>
+              </a>
+            </div>
+          </div>
+          <div id="modalDocPreview" class="p-2 bg-slate-900 border border-slate-800 rounded-lg font-mono text-[10px] text-slate-400 break-all">-</div>
+        </div>
+        <div class="p-3 bg-slate-950/70 border border-slate-800 rounded-xl space-y-1">
+          <span class="text-[10px] text-slate-500 font-bold uppercase">Deskripsi / Progres</span>
+          <p id="modalDesc" class="text-slate-300">-</p>
+        </div>
+        <div class="p-3 bg-emerald-950/20 border border-emerald-800/40 rounded-xl space-y-1">
+          <span class="text-[10px] text-emerald-400 font-bold uppercase">Tindakan Selanjutnya (Next Action)</span>
+          <p id="modalNextAction" class="font-medium text-emerald-200">-</p>
+        </div>
+      </div>
+      <div class="p-3 bg-slate-950/80 border-t border-slate-800 flex justify-end">
+        <button onclick="closeDetailModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl cursor-pointer">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: TAMBAH ITEM ================= -->
+  <div id="addProjectModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-950/60">
+        <div class="flex items-center gap-2">
+          <i data-lucide="plus-circle" class="w-5 h-5 text-emerald-400"></i>
+          <h3 class="text-sm font-bold text-white">Tambah Item Pengadaan / Task Baru</h3>
+        </div>
+        <button onclick="closeAddModal()" class="p-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <form id="addProjectForm" onsubmit="submitNewProject(event)" class="p-4 overflow-y-auto space-y-3 custom-scrollbar text-xs">
+        <div>
+          <label class="block text-slate-400 font-medium mb-1">Nama Task / Proyek *</label>
+          <input type="text" id="addNamaTask" required placeholder="Contoh: Pengembangan Fitur Payment Gateway" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="block text-slate-400 font-medium mb-1">Program Kerja (Proker) Utama</label>
+          <input type="text" id="addNamaProker" placeholder="Contoh: Peningkatan Transaksi Digital" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block text-slate-400 font-medium mb-1">Kategori RKF</label>
+            <select id="addRkf" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
+              <option value="RKF">RKF</option>
+              <option value="Non-RKF">Non-RKF</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-400 font-medium mb-1">Tipe</label>
+            <select id="addTipePengadaan" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
+              <option value="Eksternal">Eksternal</option>
+              <option value="Internal">Internal</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-400 font-medium mb-1">Project</label>
+            <select id="addTipeProject" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
+              <option value="Vendor">Vendor</option>
+              <option value="Internal">Internal</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-400 font-medium mb-1">Vendor</label>
+            <input type="text" id="addVendor" placeholder="PT Solusi Mitra" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-medium mb-1">PIC Unit Kerja</label>
+            <input type="text" id="addPic" value="SAPTI" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-slate-400 font-medium mb-1">Nilai Kontrak (Rp)</label>
+            <input type="number" id="addCost" placeholder="0" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
+          </div>
+          <div>
+            <label class="block text-slate-400 font-medium mb-1">End Kontrak (Due Date)</label>
+            <input type="text" id="addEndKontrak" placeholder="31 Des 2026" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
+          </div>
+        </div>
+        <div>
+          <label class="block text-slate-400 font-medium mb-1">Link Dokumen / URL Detail</label>
+          <input type="text" id="addDetailUrl" placeholder="https://drive.google.com/..." class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
+        </div>
+        <div>
+          <label class="block text-slate-400 font-medium mb-1">Next Action</label>
+          <input type="text" id="addNextAction" placeholder="Pengajuan SPK / Nota Dinas" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-hidden">
+        </div>
+        <div class="pt-2 flex justify-end gap-2 border-t border-slate-800">
+          <button type="button" onclick="closeAddModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold cursor-pointer">Batal</button>
+          <button type="submit" id="saveProjectBtn" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold transition cursor-pointer">Simpan ke Sheet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: AI ASSISTANT ================= -->
+  <div id="aiAssistantModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-950/60">
+        <div class="flex items-center gap-2"><i data-lucide="sparkles" class="w-5 h-5 text-emerald-400"></i><h3 class="text-sm font-bold text-white">AI Executive Assistant</h3></div>
+        <button onclick="closeAIModal()" class="p-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="p-4 overflow-y-auto space-y-3 custom-scrollbar text-xs">
+        <div class="p-3 bg-emerald-950/30 border border-emerald-800/40 rounded-xl space-y-1">
+          <span class="text-[10px] font-bold text-emerald-400 uppercase">Ringkasan Eksekutif Portfolio</span>
+          <p id="aiSummaryText" class="text-slate-200">Menganalisis pengadaan dan anggaran...</p>
+        </div>
+        <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl space-y-1.5">
+          <span class="text-[10px] font-bold text-rose-400 uppercase">Peringatan Jatuh Tempo & Risiko</span>
+          <ul id="aiRisksList" class="space-y-1 text-slate-300 list-disc list-inside"></ul>
+        </div>
+      </div>
+      <div class="p-3 bg-slate-950/80 border-t border-slate-800 flex justify-end">
+        <button onclick="closeAIModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl cursor-pointer">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    let appData = { procurement: [], anggaran: [], datamart: [] };
+    let currentTab = 'overview';
+    let activeCardFilters = { rkf: 'ALL', priority: 'ALL' };
+    let activeAnggaranFilter = 'ALL';
+    let activeDatamartFilter = 'ALL';
+
+    let vendorChartInstance = null;
+    let statusChartInstance = null;
+    let currentModalLink = '#';
+
+    function formatRupiah(num) {
+      if (!num || num === 0) return 'Rp 0';
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+    }
+
+    function switchTab(tabId) {
+      currentTab = tabId;
+      const tabs = ['overview', 'payments', 'quota', 'table', 'anggaran', 'datamart'];
+      tabs.forEach(t => {
+        document.getElementById(`view-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`tab-${t}`);
+        if (btn) btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white';
+      });
+
+      document.getElementById(`view-${tabId}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      if (activeBtn) activeBtn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition bg-emerald-600 text-white shadow-xs';
+
+      const procKpi = document.getElementById('procurementKpiSection');
+      if (['anggaran', 'datamart'].includes(tabId)) procKpi.classList.add('hidden');
+      else procKpi.classList.remove('hidden');
+
+      lucide.createIcons();
+    }
+
+    function loadAllData() {
+      const refreshBtn = document.getElementById('refreshBtn');
+      if (refreshBtn) refreshBtn.classList.add('animate-spin');
+
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(onDataLoaded)
+          .withFailureHandler((err) => {
+            if (refreshBtn) refreshBtn.classList.remove('animate-spin');
+            alert('Gagal memuat data dari Google Sheet: ' + err);
+          })
+          .getAllDashboardData();
+      } else {
+        fetch('/api/sheet-data')
+          .then(r => r.json())
+          .then(res => {
+            onDataLoaded({
+              procurementItems: res.items || [],
+              anggaranItems: res.anggaranItems || [],
+              datamartItems: res.datamartItems || [],
+              lastUpdated: res.lastUpdated || new Date().toLocaleString('id-ID')
+            });
+          })
+          .catch(() => {
+            if (refreshBtn) refreshBtn.classList.remove('animate-spin');
+          });
+      }
+    }
+
+    function onDataLoaded(data) {
+      const refreshBtn = document.getElementById('refreshBtn');
+      if (refreshBtn) refreshBtn.classList.remove('animate-spin');
+
+      appData.procurement = data.procurementItems || [];
+      appData.anggaran = data.anggaranItems || [];
+      appData.datamart = data.datamartItems || [];
+
+      document.getElementById('lastUpdatedBadge').innerText = `Sinkronisasi: ${data.lastUpdated || 'Baru saja'}`;
+
+      updateProcurementKPI();
+      renderOverviewCards();
+      renderPaymentCards();
+      renderQuotaCards();
+      renderMainTable();
+      renderCharts();
+      renderAnggaranTab();
+      renderDatamartTab();
+      lucide.createIcons();
+    }
+
+    function updateProcurementKPI() {
+      const items = appData.procurement;
+      const totalCost = items.reduce((s, i) => s + (i.cost || 0), 0);
+      const opexCost = items.filter(i => (i.jenisAnggaran || '').toUpperCase().includes('OPEX')).reduce((s, i) => s + (i.cost || 0), 0);
+      const capexCost = items.filter(i => (i.jenisAnggaran || '').toUpperCase().includes('CAPEX')).reduce((s, i) => s + (i.cost || 0), 0);
+
+      document.getElementById('kpiTotalCost').innerText = formatRupiah(totalCost);
+      document.getElementById('kpiBudgetBreakdown').innerHTML = `<span>OPEX: ${formatRupiah(opexCost)}</span> • <span>CAPEX: ${formatRupiah(capexCost)}</span>`;
+      document.getElementById('kpiTotalItems').innerText = `${items.length} Item`;
+
+      const rkfItems = items.filter(i => (i.rkf || '').toUpperCase() === 'RKF');
+      const rkfCount = rkfItems.length;
+      const nonRkfCount = items.length - rkfCount;
+      document.getElementById('kpiRkfBreakdown').innerText = `RKF: ${rkfCount} • Non-RKF: ${nonRkfCount}`;
+
+      const urgentCount = items.filter(i => i.paymentPriority === 'Urgent').length;
+      document.getElementById('kpiUrgentCount').innerText = urgentCount;
+
+      const ongoingCount = items.filter(i => (i.status || '').toLowerCase().includes('on going')).length;
+      document.getElementById('kpiOngoingCount').innerText = ongoingCount;
+
+      // 5. STATUS PROYEK RKF
+      const rkfOngoing = rkfItems.filter(i => (i.status || '').toLowerCase().includes('on going') || (i.status || '').toLowerCase().includes('ongoing')).length;
+      const rkfDone = rkfItems.filter(i => (i.status || '').toLowerCase().includes('done') || (i.status || '').toLowerCase().includes('selesai')).length;
+      const rkfNotStarted = rkfCount - rkfOngoing - rkfDone;
+
+      document.getElementById('kpiRkfOngoing').innerText = rkfOngoing;
+      document.getElementById('kpiRkfPending').innerText = `${rkfNotStarted} Belum Mulai`;
+
+      const doneWrapper = document.getElementById('kpiRkfDoneWrapper');
+      if (rkfDone > 0) {
+        doneWrapper.classList.remove('hidden');
+        document.getElementById('kpiRkfDone').innerText = `${rkfDone} Selesai`;
+      } else {
+        doneWrapper.classList.add('hidden');
+      }
+    }
+
+    function getCardHtml(item) {
+      const isUrgent = item.paymentPriority === 'Urgent';
+      const isUpcoming = item.paymentPriority === 'Upcoming';
+      const isRkf = (item.rkf || '').toUpperCase() === 'RKF';
+      const borderClass = isUrgent ? 'border-l-4 border-l-rose-500 bg-rose-950/10' : (isUpcoming ? 'border-l-4 border-l-amber-500 bg-amber-950/10' : 'border-l-4 border-l-emerald-500');
+
+      return `
+        <div class="bg-slate-900/90 border border-slate-800 ${borderClass} rounded-xl p-3.5 flex flex-col justify-between hover:border-slate-700 transition">
+          <div>
+            <div class="flex items-center justify-between gap-1 mb-1.5">
+              <span class="text-xs font-bold text-white truncate">${item.vendor || 'In-House'}</span>
+              <div class="flex gap-1">
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase ${isRkf ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-slate-800 text-slate-400 border border-slate-700'}">${item.rkf || 'Non-RKF'}</span>
+                <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase ${isUrgent ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'bg-slate-800 text-slate-300'}">${item.paymentPriority || 'Safe'}</span>
+              </div>
+            </div>
+            <h4 class="text-xs font-bold text-slate-200 line-clamp-1">${item.namaTask}</h4>
+            <p class="text-[10px] text-slate-400 line-clamp-1 mb-2">${item.namaProker}</p>
+            <div class="space-y-1 py-2 border-y border-slate-800 font-mono text-[11px]">
+              <div class="flex justify-between"><span class="text-slate-500">Nilai:</span><span class="font-bold text-emerald-400">${formatRupiah(item.cost)}</span></div>
+              <div class="flex justify-between"><span class="text-slate-500">Start:</span><span class="text-slate-300">${item.startKontrak || '-'}</span></div>
+              <div class="flex justify-between"><span class="text-rose-400 font-bold">Due Date:</span><span class="font-bold text-rose-400">${item.endKontrak || '-'}</span></div>
+            </div>
+          </div>
+          <div class="mt-2.5 pt-1 flex items-center justify-between gap-1">
+            <div class="truncate flex-1 text-[10px] text-slate-400"><span class="font-bold uppercase text-slate-500">Next:</span> ${item.nextAction || '-'}</div>
+            <div class="flex items-center gap-1 shrink-0">
+              ${item.detailUrl && item.detailUrl !== '#' ? `
+                <a href="${item.detailUrl}" target="_blank" class="p-1 rounded bg-slate-800 hover:bg-slate-700 text-blue-400" title="Buka Dokumen"><i data-lucide="file-text" class="w-3.5 h-3.5"></i></a>
+              ` : ''}
+              <button onclick="openDetailModal('${item.id}')" class="px-2 py-1 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 rounded text-[10px] font-bold flex items-center gap-0.5 cursor-pointer">
+                <span>Detail</span><i data-lucide="chevron-right" class="w-3 h-3"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderOverviewCards() {
+      const search = (document.getElementById('overviewSearchInput')?.value || '').toLowerCase();
+      const filtered = appData.procurement.filter(item => {
+        return !search ||
+          (item.namaProker && item.namaProker.toLowerCase().includes(search)) ||
+          (item.namaTask && item.namaTask.toLowerCase().includes(search)) ||
+          (item.vendor && item.vendor.toLowerCase().includes(search)) ||
+          (item.pic && item.pic.toLowerCase().includes(search)) ||
+          (item.rkf && item.rkf.toLowerCase().includes(search));
+      });
+
+      const container = document.getElementById('overviewCardsGrid');
+      if (!container) return;
+
+      if (!filtered.length) {
+        container.innerHTML = `<div class="col-span-full py-8 text-center text-xs text-slate-500">Tidak ada jadwal kontrak yang cocok dengan pencarian "${search}".</div>`;
+        return;
+      }
+
+      const displayItems = search ? filtered : filtered.slice(0, 3);
+      container.innerHTML = displayItems.map(getCardHtml).join('');
+      lucide.createIcons();
+    }
+
+    function renderPaymentCards() {
+      const search = (document.getElementById('paymentsSearchInput')?.value || '').toLowerCase();
+      const filtered = appData.procurement.filter(item => {
+        const matchSearch = !search ||
+          (item.namaProker && item.namaProker.toLowerCase().includes(search)) ||
+          (item.namaTask && item.namaTask.toLowerCase().includes(search)) ||
+          (item.vendor && item.vendor.toLowerCase().includes(search)) ||
+          (item.pic && item.pic.toLowerCase().includes(search)) ||
+          (item.rkf && item.rkf.toLowerCase().includes(search));
+
+        const matchRkf = activeCardFilters.rkf === 'ALL' || (item.rkf || '').toUpperCase() === activeCardFilters.rkf.toUpperCase();
+        const matchPri = activeCardFilters.priority === 'ALL' || item.paymentPriority === activeCardFilters.priority;
+        return matchSearch && matchRkf && matchPri;
+      });
+
+      const container = document.getElementById('paymentCardsGrid');
+      if (!container) return;
+
+      if (!filtered.length) {
+        container.innerHTML = `<div class="col-span-full py-8 text-center text-xs text-slate-500">Tidak ada jadwal jatuh tempo yang cocok.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(getCardHtml).join('');
+      lucide.createIcons();
+    }
+
+    function setCardFilter(type, val) {
+      activeCardFilters[type] = val;
+      renderPaymentCards();
+      lucide.createIcons();
+    }
+
+    function renderQuotaCards() {
+      const container = document.getElementById('quotaCardsGrid');
+      const quotaItems = appData.procurement.filter(i => i.kuota !== null && i.kuota > 0);
+      if (!quotaItems.length) {
+        container.innerHTML = `<div class="col-span-full py-8 text-center text-xs text-slate-500">Belum ada item kuota API.</div>`;
+        return;
+      }
+      container.innerHTML = quotaItems.map(item => {
+        const usage = item.utilisasi || 0;
+        const isOver = usage >= 100;
+        return `
+          <div class="bg-slate-900 border ${isOver ? 'border-rose-800/80 bg-rose-950/10' : 'border-slate-800'} rounded-2xl p-4 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-bold text-white line-clamp-1">${item.namaTask}</h4>
+              <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded ${isOver ? 'bg-rose-900 text-rose-200' : 'bg-emerald-950 text-emerald-300'}">${usage}%</span>
+            </div>
+            <div class="text-[10px] text-slate-400 font-mono">Vendor: ${item.vendor}</div>
+            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+              <div class="h-full rounded-full ${isOver ? 'bg-rose-500' : 'bg-emerald-500'}" style="width: ${Math.min(usage, 100)}%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] font-mono text-slate-400 pt-1">
+              <span>Kuota: ${Number(item.kuota).toLocaleString('id-ID')}</span>
+              <span>Pakai: ${Number(item.totalPemakaian || 0).toLocaleString('id-ID')}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderMainTable() {
+      const search = (document.getElementById('tableSearchInput')?.value || '').toLowerCase();
+      const statusFilter = document.getElementById('tableStatusFilter')?.value || 'ALL';
+      const rkfFilter = document.getElementById('tableRkfFilter')?.value || 'ALL';
+
+      const filtered = appData.procurement.filter(item => {
+        const matchSearch = !search ||
+          (item.namaProker && item.namaProker.toLowerCase().includes(search)) ||
+          (item.namaTask && item.namaTask.toLowerCase().includes(search)) ||
+          (item.vendor && item.vendor.toLowerCase().includes(search)) ||
+          (item.pic && item.pic.toLowerCase().includes(search));
+
+        const matchStatus = statusFilter === 'ALL' || (item.status && item.status.toLowerCase().includes(statusFilter.toLowerCase()));
+        const matchRkf = rkfFilter === 'ALL' || (item.rkf || '').toUpperCase() === rkfFilter.toUpperCase();
+        return matchSearch && matchStatus && matchRkf;
+      });
+
+      const tbody = document.getElementById('mainTableBody');
+      if (!tbody) return;
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-xs text-slate-500">Tidak ada data yang cocok dengan kriteria filter.</td></tr>`;
+        document.getElementById('tableCountInfo').innerText = `Menampilkan 0 dari ${appData.procurement.length} item`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(item => {
+        const isUrgent = item.paymentPriority === 'Urgent';
+        const hasUrl = item.detailUrl && item.detailUrl !== '#';
+        const isRkf = (item.rkf || '').toUpperCase() === 'RKF';
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="p-3 text-center font-mono font-bold text-slate-500">${item.id}</td>
+            <td class="p-3 max-w-xs">
+              <div class="font-bold text-slate-100 line-clamp-1">${item.namaTask}</div>
+              <div class="text-[10px] text-slate-400 line-clamp-1">${item.namaProker}</div>
+              <div class="flex gap-1 mt-1">
+                <span class="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded ${isRkf ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-slate-800 text-slate-400 border border-slate-700'}">${item.rkf || 'Non-RKF'}</span>
+                <span class="text-[9px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">${item.tipePengadaan}</span>
+              </div>
+            </td>
+            <td class="p-3">
+              <div class="font-bold text-slate-200">${item.vendor}</div>
+              <div class="text-[10px] text-slate-400 font-mono">PIC: ${item.pic}</div>
+            </td>
+            <td class="p-3 text-right font-mono font-bold text-emerald-400">${formatRupiah(item.cost)}</td>
+            <td class="p-3 font-mono text-[11px]">
+              <div class="text-slate-400">Start: ${item.startKontrak || '-'}</div>
+              <div class="${isUrgent ? 'text-rose-400 font-bold' : 'text-slate-300'}">Due: ${item.endKontrak || '-'}</div>
+            </td>
+            <td class="p-3 text-center">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${item.status === 'Done' ? 'bg-emerald-950 text-emerald-300' : 'bg-blue-950 text-blue-300'}">${item.status}</span>
+            </td>
+            <td class="p-3 text-center">
+              ${hasUrl ? `
+                <a href="${item.detailUrl}" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 border border-emerald-800 text-[10px] font-bold">
+                  <i data-lucide="file-text" class="w-3 h-3"></i><span>Dokumen</span>
+                </a>
+              ` : `<span class="text-slate-600">-</span>`}
+            </td>
+            <td class="p-3 text-[11px] text-slate-300 max-w-xs line-clamp-2">${item.nextAction || item.deskripsi || '-'}</td>
+            <td class="p-3 text-center">
+              <button onclick="openDetailModal('${item.id}')" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white cursor-pointer"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      document.getElementById('tableCountInfo').innerText = `Menampilkan ${filtered.length} dari ${appData.procurement.length} item`;
+      lucide.createIcons();
+    }
+
+    function renderCharts() {
+      if (vendorChartInstance) vendorChartInstance.destroy();
+      if (statusChartInstance) statusChartInstance.destroy();
+
+      const vendorCosts = {};
+      appData.procurement.forEach(i => {
+        const v = (i.vendor || 'In-House').trim();
+        vendorCosts[v] = (vendorCosts[v] || 0) + (i.cost || 0);
+      });
+      const sortedVendors = Object.keys(vendorCosts).sort((a, b) => vendorCosts[b] - vendorCosts[a]).slice(0, 5);
+
+      const vCtx = document.getElementById('vendorChart')?.getContext('2d');
+      if (vCtx) {
+        vendorChartInstance = new Chart(vCtx, {
+          type: 'bar',
+          data: {
+            labels: sortedVendors.map(v => v.length > 20 ? v.substring(0, 18) + '...' : v),
+            datasets: [{ label: 'Biaya (Rp)', data: sortedVendors.map(v => vendorCosts[v]), backgroundColor: '#059669', borderRadius: 6 }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } },
+              y: { ticks: { color: '#94a3b8', callback: (val) => (val >= 1e9 ? (val/1e9).toFixed(1)+' M' : (val/1e6).toFixed(0)+' Jt') }, grid: { color: '#334155' } }
+            }
+          }
+        });
+      }
+
+      let ongoingCount = 0, doneCount = 0, otherCount = 0;
+      appData.procurement.forEach(i => {
+        const s = (i.status || '').toLowerCase();
+        if (s.includes('done') || s.includes('selesai')) doneCount++;
+        else if (s.includes('on going') || s.includes('ongoing')) ongoingCount++;
+        else otherCount++;
+      });
+
+      const sCtx = document.getElementById('statusChart')?.getContext('2d');
+      if (sCtx) {
+        statusChartInstance = new Chart(sCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['On going', 'Selesai / Done', 'Lainnya'],
+            datasets: [{ data: [ongoingCount, doneCount, otherCount], backgroundColor: ['#2563eb', '#059669', '#d97706'], borderWidth: 0 }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: { legend: { position: 'right', labels: { color: '#cbd5e1', font: { size: 10 } } } }
+          }
+        });
+      }
+    }
+
+    function renderAnggaranTab() {
+      const items = appData.anggaran;
+      const total2026 = items.reduce((s, i) => s + (i.cost2026 || 0), 0);
+      const total2027 = items.reduce((s, i) => s + (i.forecastingCost2027 || 0), 0);
+      const growth = total2026 > 0 ? ((total2027 - total2026) / total2026) * 100 : 0;
+
+      const opex2026 = items.filter(i => i.anggaran === 'OPEX').reduce((s, i) => s + (i.cost2026 || 0), 0);
+      const capex2026 = items.filter(i => i.anggaran === 'CAPEX').reduce((s, i) => s + (i.cost2026 || 0), 0);
+
+      document.getElementById('kpiAng2026').innerText = formatRupiah(total2026);
+      document.getElementById('kpiAngOpexCapex').innerText = `OPEX: ${formatRupiah(opex2026)} • CAPEX: ${formatRupiah(capex2026)}`;
+      document.getElementById('kpiAng2027').innerText = formatRupiah(total2027);
+      document.getElementById('kpiAngGrowth').innerText = `+${growth.toFixed(1)}%`;
+      document.getElementById('kpiAngDiff').innerText = `Selisih: +${formatRupiah(total2027 - total2026)}`;
+      document.getElementById('kpiAngTotalItems').innerText = `${items.length} Pekerjaan`;
+
+      renderAnggaranTable();
+    }
+
+    function renderAnggaranTable() {
+      const search = (document.getElementById('anggaranSearchInput')?.value || '').toLowerCase();
+      const filtered = appData.anggaran.filter(item => {
+        const matchSearch = !search || item.produk.toLowerCase().includes(search) || item.mataAnggaran.toLowerCase().includes(search);
+        const matchType = activeAnggaranFilter === 'ALL' || item.anggaran === activeAnggaranFilter;
+        return matchSearch && matchType;
+      });
+
+      const tbody = document.getElementById('anggaranTableBody');
+      if (!tbody) return;
+
+      tbody.innerHTML = filtered.map((item, idx) => {
+        const growth = item.cost2026 > 0 ? ((item.forecastingCost2027 - item.cost2026) / item.cost2026) * 100 : 100;
+        return `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="p-3 text-center font-mono text-slate-500">${item.no || idx + 1}</td>
+            <td class="p-3 font-bold text-white">${item.produk}</td>
+            <td class="p-3 text-center">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${item.anggaran === 'CAPEX' ? 'bg-blue-950 text-blue-300 border border-blue-800' : 'bg-emerald-950 text-emerald-300 border border-emerald-800'}">${item.anggaran}</span>
+            </td>
+            <td class="p-3 text-center font-mono text-slate-400">${item.mataAnggaran || '-'}</td>
+            <td class="p-3 text-right font-mono font-bold text-emerald-400">${formatRupiah(item.cost2026)}</td>
+            <td class="p-3 text-right font-mono font-bold text-blue-400">${formatRupiah(item.forecastingCost2027)}</td>
+            <td class="p-3 text-center font-mono font-bold text-purple-400">+${growth.toFixed(0)}%</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function setAnggaranFilter(val) {
+      activeAnggaranFilter = val;
+      ['all', 'opex', 'capex'].forEach(t => {
+        const btn = document.getElementById(`af-${t}`);
+        if (btn) btn.className = 'px-3 py-1 rounded-lg text-slate-400 hover:text-white';
+      });
+      document.getElementById(`af-${val.toLowerCase()}`).className = 'px-3 py-1 rounded-lg bg-emerald-600 text-white shadow-xs';
+      renderAnggaranTable();
+    }
+
+    function renderDatamartTab() {
+      const items = appData.datamart;
+      const doneCount = items.filter(i => (i.keteranganStatus || '').toLowerCase().includes('done') || (i.statusTable || '').toLowerCase().includes('dm_')).length;
+      const rejectedCount = items.filter(i => (i.statusTable || '').toLowerCase().includes('rejected')).length;
+      const inProgressCount = items.length - doneCount - rejectedCount;
+
+      document.getElementById('kpiDmTotal').innerText = `${items.length} Tiket`;
+      document.getElementById('kpiDmDone').innerText = `${doneCount} Table`;
+      document.getElementById('kpiDmProgress').innerText = `${inProgressCount} Tiket`;
+      document.getElementById('kpiDmRejected').innerText = `${rejectedCount} Tiket`;
+
+      renderDatamartTable();
+    }
+
+    function renderDatamartTable() {
+      const search = (document.getElementById('datamartSearchInput')?.value || '').toLowerCase();
+      const filtered = appData.datamart.filter(item => {
+        const matchSearch = !search || item.idTiket.toLowerCase().includes(search) || item.nama.toLowerCase().includes(search) || item.output.toLowerCase().includes(search) || item.statusTable.toLowerCase().includes(search);
+        let matchStatus = true;
+        if (activeDatamartFilter === 'DONE') matchStatus = item.keteranganStatus.toLowerCase().includes('done') || item.statusTable.toLowerCase().includes('dm_');
+        else if (activeDatamartFilter === 'REJECTED') matchStatus = item.statusTable.toLowerCase().includes('rejected');
+        else if (activeDatamartFilter === 'IN_PROGRESS') matchStatus = !item.keteranganStatus.toLowerCase().includes('done') && !item.statusTable.toLowerCase().includes('rejected');
+        return matchSearch && matchStatus;
+      });
+
+      const tbody = document.getElementById('datamartTableBody');
+      if (!tbody) return;
+
+      tbody.innerHTML = filtered.map((item, idx) => {
+        const hasTable = item.statusTable && item.statusTable.includes('pgd-prd');
+        return `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="p-3 text-center font-mono text-slate-500">${item.no || idx + 1}</td>
+            <td class="p-3 text-center font-mono"><span class="px-2 py-1 rounded bg-slate-900 border border-slate-800 font-bold text-white">${item.idTiket}</span></td>
+            <td class="p-3">
+              <div class="font-bold text-white">${item.nama}</div>
+              <div class="text-[10px] text-emerald-400 font-medium">Output: ${item.output}</div>
+            </td>
+            <td class="p-3 text-center">
+              ${item.linkTiket && item.linkTiket !== '#' ? `<a href="${item.linkTiket}" target="_blank" class="px-2 py-1 rounded bg-blue-950 text-blue-300 text-[10px] font-bold hover:underline">Jira Ticket</a>` : '-'}
+            </td>
+            <td class="p-3 font-mono text-[11px]">
+              ${hasTable ? `
+                <div class="flex items-center justify-between gap-1 p-1 rounded bg-slate-950 border border-slate-800">
+                  <span class="text-emerald-400 truncate">${item.statusTable}</span>
+                  <button onclick="navigator.clipboard.writeText('${item.statusTable}'); alert('Tersalin: ${item.statusTable}');" class="p-1 text-slate-400 hover:text-white" title="Salin Table ID"><i data-lucide="copy" class="w-3 h-3"></i></button>
+                </div>
+              ` : `<span class="text-rose-400 font-bold">${item.statusTable}</span>`}
+            </td>
+            <td class="p-3 text-slate-300 text-xs">${item.keteranganStatus}</td>
+          </tr>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function setDatamartFilter(val) {
+      activeDatamartFilter = val;
+      ['all', 'done', 'prog', 'rej'].forEach(t => {
+        const btn = document.getElementById(`df-${t}`);
+        if (btn) btn.className = 'px-3 py-1 rounded-lg text-slate-400 hover:text-white';
+      });
+      const activeMap = { ALL: 'df-all', DONE: 'df-done', IN_PROGRESS: 'df-prog', REJECTED: 'df-rej' };
+      document.getElementById(activeMap[val]).className = 'px-3 py-1 rounded-lg bg-emerald-600 text-white shadow-xs';
+      renderDatamartTable();
+    }
+
+    function openDetailModal(id) {
+      const item = appData.procurement.find(i => String(i.id) === String(id));
+      if (!item) return;
+      
+      const isRkf = (item.rkf || '').toUpperCase() === 'RKF';
+      const rkfPill = document.getElementById('modalRkfPill');
+      rkfPill.innerText = item.rkf || 'Non-RKF';
+      rkfPill.className = `px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border ${isRkf ? 'bg-emerald-950 text-emerald-300 border-emerald-800' : 'bg-slate-800 text-slate-300 border-slate-700'}`;
+
+      document.getElementById('modalTipePill').innerText = `${item.tipePengadaan} • ${item.tipeProject}`;
+      document.getElementById('modalTaskName').innerText = item.namaTask;
+      document.getElementById('modalProkerName').innerText = `Proker: ${item.namaProker}`;
+      document.getElementById('modalVendor').innerText = item.vendor;
+      document.getElementById('modalPic').innerText = item.pic;
+      document.getElementById('modalCost').innerText = formatRupiah(item.cost);
+      document.getElementById('modalDueDate').innerText = item.endKontrak || '-';
+      document.getElementById('modalDesc').innerText = item.deskripsi || '-';
+      document.getElementById('modalNextAction').innerText = item.nextAction || '-';
+
+      currentModalLink = item.detailUrl || '#';
+      document.getElementById('modalDocPreview').innerText = currentModalLink !== '#' ? currentModalLink : 'Belum ada link dokumen';
+      document.getElementById('modalOpenDocBtn').href = currentModalLink !== '#' ? currentModalLink : '#';
+      document.getElementById('projectDetailModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+    function closeDetailModal() { document.getElementById('projectDetailModal').classList.add('hidden'); }
+    function copyModalLink() {
+      if (currentModalLink && currentModalLink !== '#') {
+        navigator.clipboard.writeText(currentModalLink);
+        document.getElementById('modalCopyText').innerText = 'Tersalin!';
+        setTimeout(() => { document.getElementById('modalCopyText').innerText = 'Salin URL'; }, 2000);
+      }
+    }
+
+    function openAddModal() { document.getElementById('addProjectModal').classList.remove('hidden'); }
+    function closeAddModal() { document.getElementById('addProjectModal').classList.add('hidden'); }
+
+    function submitNewProject(e) {
+      e.preventDefault();
+      const saveBtn = document.getElementById('saveProjectBtn');
+      saveBtn.innerText = 'Menyimpan...';
+
+      const newItem = {
+        namaTask: document.getElementById('addNamaTask').value,
+        namaProker: document.getElementById('addNamaProker').value,
+        rkf: document.getElementById('addRkf').value,
+        tipePengadaan: document.getElementById('addTipePengadaan').value,
+        tipeProject: document.getElementById('addTipeProject').value,
+        vendor: document.getElementById('addVendor').value,
+        pic: document.getElementById('addPic').value,
+        cost: document.getElementById('addCost').value,
+        endKontrak: document.getElementById('addEndKontrak').value,
+        detailUrl: document.getElementById('addDetailUrl').value,
+        nextAction: document.getElementById('addNextAction').value
+      };
+
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler(() => {
+            saveBtn.innerText = 'Simpan ke Sheet';
+            closeAddModal();
+            loadAllData();
+          })
+          .addProcurementItem(newItem);
+      } else {
+        setTimeout(() => {
+          saveBtn.innerText = 'Simpan ke Sheet';
+          closeAddModal();
+          alert('Data berhasil disimpan!');
+        }, 500);
+      }
+    }
+
+    function openAIModal() {
+      document.getElementById('aiAssistantModal').classList.remove('hidden');
+      document.getElementById('aiSummaryText').innerText = `Dashboard memantau ${appData.procurement.length} item pengadaan, total komitmen anggaran ${document.getElementById('kpiTotalCost').innerText}, dan ${appData.datamart.length} tiket request Datamart.`;
+      
+      const urgentItems = appData.procurement.filter(i => i.paymentPriority === 'Urgent');
+      const risksList = document.getElementById('aiRisksList');
+      if (urgentItems.length > 0) {
+        risksList.innerHTML = urgentItems.map(i => `<li><b>${i.vendor}:</b> ${i.namaTask} jatuh tempo pada ${i.endKontrak} (Segera tindak lanjuti SPK/Adendum).</li>`).join('');
+      } else {
+        risksList.innerHTML = `<li>Semua jadwal kontrak berjalan sesuai timeline.</li>`;
+      }
+      lucide.createIcons();
+    }
+    function closeAIModal() { document.getElementById('aiAssistantModal').classList.add('hidden'); }
+
+    function exportCurrentViewCSV() {
+      let csv = '';
+      if (currentTab === 'anggaran') {
+        const headers = ['No,Produk,Anggaran,Mata Anggaran,Cost 2026,Forecasting 2027'];
+        const rows = appData.anggaran.map(i => `${i.no},"${i.produk}",${i.anggaran},${i.mataAnggaran},${i.cost2026},${i.forecastingCost2027}`);
+        csv = [headers, ...rows].join('\n');
+      } else if (currentTab === 'datamart') {
+        const headers = ['No,ID Tiket,Nama Permintaan,Output,Link Tiket,Status Table,Keterangan'];
+        const rows = appData.datamart.map(i => `${i.no},${i.idTiket},"${i.nama}","${i.output}",${i.linkTiket},"${i.statusTable}","${i.keteranganStatus}"`);
+        csv = [headers, ...rows].join('\n');
+      } else {
+        const headers = ['ID,Nama Proker,Nama Task,RKF,Vendor,PIC,Cost,Start Kontrak,End Kontrak,Status'];
+        const rows = appData.procurement.map(i => `${i.id},"${i.namaProker}","${i.namaTask}",${i.rkf},"${i.vendor}",${i.pic},${i.cost},${i.startKontrak},${i.endKontrak},${i.status}`);
+        csv = [headers, ...rows].join('\n');
+      }
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `Export_${currentTab}_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+    }
+
+    function filterByPriority(p) { switchTab('payments'); setCardFilter('priority', p); }
+    function filterByStatus(s) { switchTab('table'); document.getElementById('tableStatusFilter').value = s; renderMainTable(); }
+    function filterByRkfOnly() { switchTab('table'); document.getElementById('tableRkfFilter').value = 'RKF'; renderMainTable(); }
+
+    window.addEventListener('load', () => {
+      loadAllData();
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
