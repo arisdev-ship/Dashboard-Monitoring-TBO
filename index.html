@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Executive Procurement & Datamart Dashboard</title>
+  <title>Executive Procurement, Datamart & Data Audit Promo Dashboard</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts -->
@@ -40,7 +40,7 @@
               LIVE GOOGLE SHEET
             </span>
           </div>
-          <p class="text-[11px] text-slate-400">Monitoring Kontrak Vendor, Alokasi Anggaran OPEX/CAPEX, & Request Datamart</p>
+          <p class="text-[11px] text-slate-400">Monitoring Kontrak Vendor, Alokasi Anggaran OPEX/CAPEX, Request Datamart & Data Audit Promo</p>
         </div>
       </div>
 
@@ -65,7 +65,7 @@
   <!-- MAIN CONTAINER -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 space-y-4">
 
-    <!-- Navigation Tabs (6 Menu Lengkap & Fungsional) -->
+    <!-- Navigation Tabs (Lengkap 7 Menu Termasuk Data Audit Promo) -->
     <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
       <div class="flex flex-wrap items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
         <button onclick="switchTab('overview')" id="tab-overview" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition bg-emerald-600 text-white shadow-xs">
@@ -92,6 +92,10 @@
           <i data-lucide="folder-git-2" class="w-3.5 h-3.5 text-blue-400"></i>
           <span>Request Datamart</span>
         </button>
+        <button onclick="switchTab('audit')" id="tab-audit" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition text-purple-400 hover:text-white">
+          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-purple-400"></i>
+          <span>Data Audit Promo</span>
+        </button>
       </div>
 
       <div id="lastUpdatedBadge" class="text-[11px] text-slate-500 font-mono hidden md:block">
@@ -99,7 +103,7 @@
       </div>
     </div>
 
-    <!-- 5 KOLOM KPI SECTION (Interaktif & Akurat) -->
+    <!-- 5 KOLOM KPI SECTION (Hanya untuk Overview, Payments, Quota, & Table) -->
     <section id="procurementKpiSection" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
       
       <!-- 1. Total Nilai Kontrak -->
@@ -198,7 +202,7 @@
         </div>
       </div>
 
-      <!-- Quick Deadline Section with SEARCH FIELD -->
+      <!-- Quick Deadline Section -->
       <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
           <div>
@@ -211,7 +215,6 @@
           </button>
         </div>
 
-        <!-- SEARCH INPUT DI OVERVIEW -->
         <div class="relative w-full">
           <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400"></i>
           <input 
@@ -223,12 +226,11 @@
           >
         </div>
 
-        <!-- Cards Grid -->
         <div id="overviewCardsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1"></div>
       </div>
     </div>
 
-    <!-- TAB 2: PAYMENT DEADLINES (DENGAN CLICKABLE DROPDOWN FILTER STATUS DARI SHEET) -->
+    <!-- TAB 2: PAYMENT DEADLINES -->
     <div id="view-payments" class="hidden space-y-4">
       <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-800">
@@ -237,10 +239,7 @@
             <p class="text-[11px] text-slate-400">Monitoring verifikasi BAST, SPK, status pengerjaan, dan link dokumen penagihan</p>
           </div>
           
-          <!-- CLICKABLE DROPDOWN FILTERS (STATUS SHEET, RKF, DEADLINE) -->
           <div class="flex flex-wrap items-center gap-2">
-            
-            <!-- Dropdown 1: Status Proyek dari Google Sheet -->
             <div class="flex items-center gap-1.5 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 shadow-2xs">
               <span class="text-[10px] font-bold text-slate-400 uppercase">Status:</span>
               <select id="paymentStatusDropdown" onchange="renderPaymentCards()" class="bg-transparent text-xs font-semibold text-white focus:outline-hidden cursor-pointer">
@@ -248,7 +247,6 @@
               </select>
             </div>
 
-            <!-- Dropdown 2: Kategori RKF / Non-RKF -->
             <div class="flex items-center gap-1.5 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 shadow-2xs">
               <span class="text-[10px] font-bold text-slate-400 uppercase">Kategori:</span>
               <select id="paymentRkfDropdown" onchange="renderPaymentCards()" class="bg-transparent text-xs font-semibold text-white focus:outline-hidden cursor-pointer">
@@ -258,7 +256,6 @@
               </select>
             </div>
 
-            <!-- Dropdown 3: Prioritas Jatuh Tempo -->
             <div class="flex items-center gap-1.5 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 shadow-2xs">
               <span class="text-[10px] font-bold text-slate-400 uppercase">Deadline:</span>
               <select id="paymentPriorityDropdown" onchange="renderPaymentCards()" class="bg-transparent text-xs font-semibold text-white focus:outline-hidden cursor-pointer">
@@ -268,7 +265,6 @@
                 <option value="Safe" class="bg-slate-900 text-emerald-400">Safe (&gt;60 Hari)</option>
               </select>
             </div>
-
           </div>
         </div>
 
@@ -454,9 +450,63 @@
       </div>
     </div>
 
+    <!-- TAB 7: DATA AUDIT PROMO (BERSIH SESUAI GOOGLE SHEET, HANYA KOLOM SEARCH & TABEL) -->
+    <div id="view-audit" class="hidden space-y-4">
+      <!-- Search & Export Controls Only -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl">
+        <div class="relative flex-1 w-full">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3 text-slate-400"></i>
+          <input 
+            type="text" 
+            id="auditSearchInput" 
+            oninput="renderAuditTable()" 
+            placeholder="Cari promo berdasarkan No, Nama Promo, Deskripsi, atau Kode Promo..." 
+            class="w-full pl-10 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-purple-500 transition shadow-inner"
+          >
+        </div>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <button 
+            onclick="exportAuditPromoCSV()" 
+            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition border border-slate-700 shadow-xs cursor-pointer shrink-0" 
+            title="Download CSV Sesuai Kolom Sheet"
+          >
+            <i data-lucide="download" class="w-3.5 h-3.5 text-purple-400"></i>
+            <span>Export CSV</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabel Data Audit Promo -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-slate-950/90 border-b border-slate-800 text-slate-400 uppercase text-[10px] font-bold sticky top-0 tracking-wider">
+              <tr>
+                <th class="p-3.5 w-12 text-center">No</th>
+                <th class="p-3.5 min-w-[200px]">Nama Promo</th>
+                <th class="p-3.5 min-w-[280px]">Deskripsi</th>
+                <th class="p-3.5 min-w-[150px]">Kode Promo</th>
+                <th class="p-3.5 text-center min-w-[130px]">Link Dokumen</th>
+                <th class="p-3.5 text-right min-w-[140px]">Budgeting</th>
+                <th class="p-3.5 text-right min-w-[160px]">Penyerapan Budgeting</th>
+                <th class="p-3.5 text-center w-14">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="auditTableBody" class="divide-y divide-slate-800/60 font-sans"></tbody>
+          </table>
+        </div>
+
+        <div class="p-3.5 bg-slate-950/80 border-t border-slate-800 flex items-center justify-between text-[11px] font-mono text-slate-400">
+          <span id="auditTableCountInfo">Menampilkan 0 item</span>
+          <span class="text-purple-400 font-bold tracking-wider">DATA AUDIT PROMO</span>
+        </div>
+      </div>
+    </div>
+
   </main>
 
-  <!-- MODAL: PROJECT DETAIL (DENGAN BADGE STATUS DARI SHEET) -->
+  <!-- MODAL: PROJECT DETAIL -->
   <div id="projectDetailModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="flex items-start justify-between p-4 border-b border-slate-800 bg-slate-950/60">
@@ -520,6 +570,78 @@
     </div>
   </div>
 
+  <!-- MODAL: DATA AUDIT PROMO DETAIL -->
+  <div id="auditDetailModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      <div class="flex items-start justify-between p-4 border-b border-slate-800 bg-slate-950/60">
+        <div>
+          <span id="auditModalNoPill" class="px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800 text-[10px] font-mono font-bold">No. 1</span>
+          <h3 id="auditModalName" class="text-base font-bold text-white mt-1.5 leading-snug">Nama Promo</h3>
+        </div>
+        <button onclick="closeAuditModal()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="p-4 overflow-y-auto space-y-3.5 text-xs">
+        <div class="p-3 bg-slate-950/70 border border-slate-800 rounded-xl space-y-1">
+          <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Deskripsi Promo</span>
+          <p id="auditModalDesc" class="text-slate-200 leading-relaxed">-</p>
+        </div>
+
+        <div class="p-3 bg-slate-950/70 border border-slate-800 rounded-xl space-y-1.5">
+          <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Kode Promo</span>
+          <div id="auditModalCodes" class="flex flex-wrap gap-1.5"></div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5 font-mono">
+          <div class="p-3 bg-slate-950/70 border border-slate-800 rounded-xl">
+            <span class="text-[10px] text-slate-500 font-bold uppercase">Budgeting</span>
+            <div id="auditModalBudget" class="font-bold text-white text-sm mt-0.5">Rp 0</div>
+          </div>
+          <div class="p-3 bg-slate-950/70 border border-slate-800 rounded-xl">
+            <span class="text-[10px] text-slate-500 font-bold uppercase">Penyerapan Budgeting</span>
+            <div id="auditModalPenyerapan" class="font-bold text-emerald-400 text-sm mt-0.5">Rp 0</div>
+          </div>
+        </div>
+
+        <div id="auditModalProgressWrapper" class="p-3 bg-slate-950/70 border border-slate-800 rounded-xl space-y-2 font-mono">
+          <div class="flex justify-between items-center text-[11px]">
+            <span class="text-slate-400 font-bold">Tingkat Penyerapan Budgeting</span>
+            <span id="auditModalPercent" class="text-emerald-400 font-bold">0%</span>
+          </div>
+          <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+            <div id="auditModalProgressBar" class="h-full bg-emerald-400 rounded-full" style="width: 0%"></div>
+          </div>
+          <div class="flex justify-between text-[10px] text-slate-400">
+            <span id="auditModalTerpakaiLabel">Terpakai: Rp 0</span>
+            <span id="auditModalSisaLabel">Sisa: Rp 0</span>
+          </div>
+        </div>
+
+        <div class="p-3 bg-slate-950/80 border border-slate-800 rounded-xl space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5 text-slate-300 font-bold">
+              <i data-lucide="file-text" class="w-4 h-4 text-purple-400"></i>
+              <span>Link Dokumen</span>
+            </div>
+            <div id="auditModalDocActionGroup" class="flex items-center gap-1.5">
+              <button onclick="copyAuditModalLink()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px] font-bold flex items-center gap-1 cursor-pointer">
+                <i data-lucide="copy" class="w-3 h-3"></i>
+                <span id="auditModalCopyText">Salin URL</span>
+              </button>
+              <a id="auditModalOpenDocBtn" href="#" target="_blank" class="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-[10px] font-bold flex items-center gap-1">
+                <span>Buka Drive</span>
+                <i data-lucide="external-link" class="w-3 h-3"></i>
+              </a>
+            </div>
+          </div>
+          <div id="auditModalDocPreview" class="p-2 bg-slate-900 border border-slate-800 rounded-lg font-mono text-[10px] text-slate-400 break-all">-</div>
+        </div>
+      </div>
+      <div class="p-3 bg-slate-950/80 border-t border-slate-800 flex justify-end">
+        <button onclick="closeAuditModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl cursor-pointer">Tutup</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: AI ASSISTANT -->
   <div id="aiAssistantModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 hidden">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
@@ -543,11 +665,11 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT LOGIC (HYBRID: GOOGLE APPS SCRIPT + DIRECT CSV FOR VERCEL/GITHUB) -->
+  <!-- JAVASCRIPT LOGIC -->
   <script>
     const GOOGLE_SHEET_ID = '1MgeRBXOfYrK3aN3sMhodMwxmJjX7OOlRqNYOZ-H3gpA';
 
-    let appData = { procurement: [], anggaran: [], datamart: [] };
+    let appData = { procurement: [], anggaran: [], datamart: [], auditPromo: [] };
     let currentTab = 'overview';
     let activeAnggaranFilter = 'ALL';
     let activeDatamartFilter = 'ALL';
@@ -555,6 +677,7 @@
     let vendorChartInstance = null;
     let statusChartInstance = null;
     let currentModalLink = '#';
+    let currentAuditModalLink = '#';
 
     function formatRupiah(num) {
       if (!num || num === 0) return 'Rp 0';
@@ -646,7 +769,7 @@
       return cleaned || '#';
     }
 
-    function processRawMatrix(procRows, angRows, dmRows) {
+    function processRawMatrix(procRows, angRows, dmRows, auditRows) {
       // 1. Process Procurement
       if (procRows && procRows.length >= 2) {
         const headers = procRows[0].map(h => cleanText(h).toLowerCase());
@@ -765,6 +888,54 @@
         })).filter(d => d.nama !== '-');
       }
 
+      // 4. Process Data Audit Promo (Sesuai Kolom Sheet)
+      if (auditRows && auditRows.length >= 2) {
+        const headers = auditRows[0].map(h => cleanText(h).toLowerCase());
+        const findCol = (patterns) => {
+          for (const p of patterns) {
+            const idx = headers.findIndex(h => h === p || h.startsWith(p));
+            if (idx !== -1) return idx;
+          }
+          for (const p of patterns) {
+            const idx = headers.findIndex(h => h.includes(p));
+            if (idx !== -1) return idx;
+          }
+          return -1;
+        };
+
+        const colNo = findCol(['no', 'id']) !== -1 ? findCol(['no', 'id']) : 0;
+        const colNamaPromo = findCol(['nama promo', 'promo', 'nama']) !== -1 ? findCol(['nama promo', 'promo', 'nama']) : 1;
+        const colDeskripsi = findCol(['deskripsi', 'keterangan']) !== -1 ? findCol(['deskripsi', 'keterangan']) : 2;
+        const colKodePromo = findCol(['kode promo', 'kode']) !== -1 ? findCol(['kode promo', 'kode']) : 3;
+        const colLinkDokumen = findCol(['link dokumen', 'dokumen', 'link', 'url']) !== -1 ? findCol(['link dokumen', 'dokumen', 'link', 'url']) : 4;
+        const colBudgeting = findCol(['budgeting', 'budget', 'anggaran', 'cost']) !== -1 ? findCol(['budgeting', 'budget', 'anggaran', 'cost']) : 5;
+        const colPenyerapan = findCol(['penyerapan budgeting', 'penyerapan', 'realisasi']) !== -1 ? findCol(['penyerapan budgeting', 'penyerapan', 'realisasi']) : 6;
+
+        appData.auditPromo = auditRows.slice(1).map((r, i) => {
+          const no = cleanText(r[colNo]) || String(i + 1);
+          const namaPromo = cleanText(r[colNamaPromo]);
+          const deskripsi = cleanText(r[colDeskripsi]);
+          const kodePromo = cleanText(r[colKodePromo]);
+          const linkDokumen = cleanUrl(r[colLinkDokumen]);
+          const budgeting = parseNum(r[colBudgeting]);
+          const penyerapan = parseNum(r[colPenyerapan]);
+          const persentase = budgeting > 0 ? Math.round((penyerapan / budgeting) * 100) : 0;
+          const sisa = Math.max(0, budgeting - penyerapan);
+
+          return {
+            no,
+            namaPromo,
+            deskripsi,
+            kodePromo,
+            linkDokumen,
+            budgeting,
+            penyerapanBudgeting: penyerapan,
+            persentasePenyerapan: persentase,
+            sisaBudget: sisa
+          };
+        }).filter(a => a.namaPromo && a.namaPromo !== '-' && (a.budgeting > 0 || a.kodePromo !== '-'));
+      }
+
       onDataLoaded();
     }
 
@@ -777,7 +948,7 @@
         google.script.run
           .withSuccessHandler(function(res) {
             if (res && res.success) {
-              processRawMatrix(res.procurementRaw, res.anggaranRaw, res.datamartRaw);
+              processRawMatrix(res.procurementRaw, res.anggaranRaw, res.datamartRaw, res.auditRaw);
             } else {
               fallbackDirectCsv();
             }
@@ -802,18 +973,21 @@
         const procUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv`;
         const angUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Anggaran`;
         const dmUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Request%20Datamart`;
+        const auditUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Data%20Audit%20Promo`;
 
-        const [rProc, rAng, rDm] = await Promise.all([
+        const [rProc, rAng, rDm, rAudit] = await Promise.all([
           fetch(procUrl).then(r => r.text()),
           fetch(angUrl).then(r => r.text()).catch(() => ''),
-          fetch(dmUrl).then(r => r.text()).catch(() => '')
+          fetch(dmUrl).then(r => r.text()).catch(() => ''),
+          fetch(auditUrl).then(r => r.text()).catch(() => '')
         ]);
 
         const pLines = rProc.split('\n').filter(l => l.trim().length > 0).map(parseCSVLine);
         const aLines = rAng ? rAng.split('\n').filter(l => l.trim().length > 0).map(parseCSVLine) : [];
         const dLines = rDm ? rDm.split('\n').filter(l => l.trim().length > 0).map(parseCSVLine) : [];
+        const audLines = rAudit ? rAudit.split('\n').filter(l => l.trim().length > 0).map(parseCSVLine) : [];
 
-        processRawMatrix(pLines, aLines, dLines);
+        processRawMatrix(pLines, aLines, dLines, audLines);
       } catch (e) {
         console.error("Gagal membaca Google Sheet:", e);
         document.getElementById('lastUpdatedBadge').innerText = "Gagal memuat Google Sheet secara langsung.";
@@ -854,25 +1028,38 @@
       renderCharts();
       renderAnggaranTab();
       renderDatamartTab();
+      renderAuditTable();
       lucide.createIcons();
     }
 
     function switchTab(tabId) {
       currentTab = tabId;
-      const tabs = ['overview', 'payments', 'quota', 'table', 'anggaran', 'datamart'];
+      const tabs = ['overview', 'payments', 'quota', 'table', 'anggaran', 'datamart', 'audit'];
       tabs.forEach(t => {
-        document.getElementById(`view-${t}`).classList.add('hidden');
+        const viewEl = document.getElementById(`view-${t}`);
+        if (viewEl) viewEl.classList.add('hidden');
         const btn = document.getElementById(`tab-${t}`);
         if (btn) btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white';
       });
 
-      document.getElementById(`view-${tabId}`).classList.remove('hidden');
+      const activeView = document.getElementById(`view-${tabId}`);
+      if (activeView) activeView.classList.remove('hidden');
+
       const activeBtn = document.getElementById(`tab-${tabId}`);
-      if (activeBtn) activeBtn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition bg-emerald-600 text-white shadow-xs';
+      if (activeBtn) {
+        if (tabId === 'audit') {
+          activeBtn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition bg-purple-600 text-white shadow-xs';
+        } else {
+          activeBtn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition bg-emerald-600 text-white shadow-xs';
+        }
+      }
 
       const procKpi = document.getElementById('procurementKpiSection');
-      if (['anggaran', 'datamart'].includes(tabId)) procKpi.classList.add('hidden');
-      else procKpi.classList.remove('hidden');
+      if (['anggaran', 'datamart', 'audit'].includes(tabId)) {
+        procKpi.classList.add('hidden');
+      } else {
+        procKpi.classList.remove('hidden');
+      }
 
       lucide.createIcons();
     }
@@ -1296,6 +1483,171 @@
       renderDatamartTable();
     }
 
+    // ==========================================
+    // TAB 7: DATA AUDIT PROMO LOGIC
+    // ==========================================
+    function renderAuditTable() {
+      const search = (document.getElementById('auditSearchInput')?.value || '').toLowerCase().trim();
+      const filtered = appData.auditPromo.filter(item => {
+        if (!search) return true;
+        return (
+          (item.no && item.no.toLowerCase().includes(search)) ||
+          (item.namaPromo && item.namaPromo.toLowerCase().includes(search)) ||
+          (item.deskripsi && item.deskripsi.toLowerCase().includes(search)) ||
+          (item.kodePromo && item.kodePromo.toLowerCase().includes(search))
+        );
+      });
+
+      const tbody = document.getElementById('auditTableBody');
+      const countLabel = document.getElementById('auditTableCountInfo');
+      if (!tbody) return;
+
+      if (countLabel) {
+        countLabel.innerText = `Menampilkan ${filtered.length} dari ${appData.auditPromo.length} item promo`;
+      }
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-xs text-slate-500">Tidak ada data promo yang cocok dengan pencarian "${search}".</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((item, idx) => {
+        const hasUrl = item.linkDokumen && item.linkDokumen !== '#' && item.linkDokumen.startsWith('http');
+        const persentase = item.persentasePenyerapan || 0;
+
+        const codesHtml = (item.kodePromo || '').split(',').map(c => `
+          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-950/70 border border-purple-800/80 text-purple-300 font-mono text-[11px] font-semibold">
+            <i data-lucide="tag" class="w-2.5 h-2.5 text-purple-400"></i>
+            ${c.trim()}
+          </span>
+        `).join('');
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="p-3.5 text-center font-mono font-bold text-slate-400">${item.no || idx + 1}</td>
+            <td class="p-3.5">
+              <div class="font-bold text-slate-100 text-[13px] leading-snug">${item.namaPromo}</div>
+            </td>
+            <td class="p-3.5">
+              <p class="text-slate-300 text-xs leading-relaxed line-clamp-3">${item.deskripsi}</p>
+            </td>
+            <td class="p-3.5">
+              <div class="flex flex-wrap gap-1">${codesHtml}</div>
+            </td>
+            <td class="p-3.5 text-center">
+              ${hasUrl ? `
+                <a href="${item.linkDokumen}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-teal-950/60 hover:bg-teal-900/80 text-teal-300 border border-teal-800 text-[11px] font-bold transition shadow-2xs" title="${item.linkDokumen}">
+                  <i data-lucide="folder-open" class="w-3.5 h-3.5 text-teal-400"></i>
+                  <span>Buka Drive</span>
+                  <i data-lucide="external-link" class="w-2.5 h-2.5 opacity-70"></i>
+                </a>
+              ` : `<span class="text-slate-600 font-mono text-xs">-</span>`}
+            </td>
+            <td class="p-3.5 text-right font-mono">
+              <div class="font-bold text-white text-[13px]">${formatRupiah(item.budgeting)}</div>
+            </td>
+            <td class="p-3.5 text-right font-mono">
+              <div class="font-bold text-emerald-400 text-[13px]">${formatRupiah(item.penyerapanBudgeting)}</div>
+              ${item.budgeting > 0 ? `
+                <div class="flex items-center justify-end gap-1.5 mt-1">
+                  <div class="w-16 bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full ${persentase >= 100 ? 'bg-amber-400' : 'bg-emerald-400'}" style="width: ${Math.min(persentase, 100)}%"></div>
+                  </div>
+                  <span class="text-[10px] text-slate-400 font-semibold">${persentase}%</span>
+                </div>
+              ` : ''}
+            </td>
+            <td class="p-3.5 text-center">
+              <button onclick="openAuditModal('${item.no}')" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition cursor-pointer" title="Lihat Detail Lengkap">
+                <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function openAuditModal(no) {
+      const item = appData.auditPromo.find(i => String(i.no) === String(no));
+      if (!item) return;
+
+      document.getElementById('auditModalNoPill').innerText = `No. ${item.no}`;
+      document.getElementById('auditModalName').innerText = item.namaPromo;
+      document.getElementById('auditModalDesc').innerText = item.deskripsi || '-';
+
+      const codesContainer = document.getElementById('auditModalCodes');
+      codesContainer.innerHTML = (item.kodePromo || '').split(',').map(c => `
+        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-purple-950 border border-purple-800 text-purple-300 font-mono text-xs font-bold">
+          <i data-lucide="tag" class="w-3 h-3 text-purple-400"></i>
+          ${c.trim()}
+        </span>
+      `).join('');
+
+      document.getElementById('auditModalBudget').innerText = formatRupiah(item.budgeting);
+      document.getElementById('auditModalPenyerapan').innerText = formatRupiah(item.penyerapanBudgeting);
+
+      const persentase = item.persentasePenyerapan || 0;
+      document.getElementById('auditModalPercent').innerText = `${persentase}%`;
+      document.getElementById('auditModalProgressBar').style.width = `${Math.min(persentase, 100)}%`;
+      document.getElementById('auditModalTerpakaiLabel').innerText = `Terpakai: ${formatRupiah(item.penyerapanBudgeting)}`;
+      document.getElementById('auditModalSisaLabel').innerText = `Sisa: ${formatRupiah(item.sisaBudget || 0)}`;
+
+      currentAuditModalLink = item.linkDokumen || '#';
+      const docPreview = document.getElementById('auditModalDocPreview');
+      const openDocBtn = document.getElementById('auditModalOpenDocBtn');
+      const actionGroup = document.getElementById('auditModalDocActionGroup');
+
+      if (currentAuditModalLink && currentAuditModalLink !== '#' && currentAuditModalLink.startsWith('http')) {
+        docPreview.innerText = currentAuditModalLink;
+        openDocBtn.href = currentAuditModalLink;
+        actionGroup.classList.remove('hidden');
+      } else {
+        docPreview.innerText = 'Belum ada link dokumen Google Drive.';
+        openDocBtn.href = '#';
+        actionGroup.classList.add('hidden');
+      }
+
+      document.getElementById('auditDetailModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeAuditModal() {
+      document.getElementById('auditDetailModal').classList.add('hidden');
+    }
+
+    function copyAuditModalLink() {
+      if (currentAuditModalLink && currentAuditModalLink !== '#' && currentAuditModalLink.startsWith('http')) {
+        navigator.clipboard.writeText(currentAuditModalLink);
+        const textSpan = document.getElementById('auditModalCopyText');
+        textSpan.innerText = 'Tersalin!';
+        setTimeout(() => { textSpan.innerText = 'Salin URL'; }, 2000);
+      }
+    }
+
+    function exportAuditPromoCSV() {
+      const items = appData.auditPromo;
+      if (!items || items.length === 0) return;
+      const headers = ['No', 'Nama Promo', 'Deskripsi', 'Kode Promo', 'Link Dokumen', 'Budgeting', 'Penyerapan Budgeting'];
+      const rows = items.map(i => [
+        i.no,
+        `"${(i.namaPromo || '').replace(/"/g, '""')}"`,
+        `"${(i.deskripsi || '').replace(/"/g, '""')}"`,
+        `"${(i.kodePromo || '').replace(/"/g, '""')}"`,
+        `"${(i.linkDokumen || '').replace(/"/g, '""')}"`,
+        i.budgeting || 0,
+        i.penyerapanBudgeting || 0
+      ]);
+      const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `Data_Audit_Promo_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+    }
+
+    // Modal Project Detail
     function openDetailModal(id) {
       const item = appData.procurement.find(i => String(i.id) === String(id));
       if (!item) return;
@@ -1338,7 +1690,7 @@
 
     function openAIModal() {
       document.getElementById('aiAssistantModal').classList.remove('hidden');
-      document.getElementById('aiSummaryText').innerText = `Dashboard memantau ${appData.procurement.length} item pengadaan, total komitmen anggaran ${document.getElementById('kpiTotalCost').innerText}, dan ${appData.datamart.length} tiket request Datamart.`;
+      document.getElementById('aiSummaryText').innerText = `Dashboard memantau ${appData.procurement.length} item pengadaan, total komitmen anggaran ${document.getElementById('kpiTotalCost').innerText}, ${appData.datamart.length} tiket request Datamart, dan ${appData.auditPromo.length} item audit promo.`;
       
       const urgentItems = appData.procurement.filter(i => i.paymentPriority === 'Urgent');
       const risksList = document.getElementById('aiRisksList');
@@ -1352,6 +1704,11 @@
     function closeAIModal() { document.getElementById('aiAssistantModal').classList.add('hidden'); }
 
     function exportCurrentViewCSV() {
+      if (currentTab === 'audit') {
+        exportAuditPromoCSV();
+        return;
+      }
+
       let csv = '';
       if (currentTab === 'anggaran') {
         const headers = ['No,Produk,Anggaran,Mata Anggaran,Cost 2026,Forecasting 2027'];
