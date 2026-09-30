@@ -1,1741 +1,1294 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Executive Procurement, Datamart & Data Audit Promo Dashboard</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Monitoring Pengadaan & Data Audit</title>
+  <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-  <!-- Lucide Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    .font-mono { font-family: 'JetBrains Mono', monospace; }
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 4px; }
+    body { font-family: 'Inter', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen pb-12 selection:bg-emerald-500 selection:text-white">
+<body class="bg-slate-50 text-slate-900 min-h-screen antialiased flex flex-col">
 
-  <!-- TOP HEADER BAR -->
-  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 sm:px-6 py-3">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-900/30 shrink-0">
-          <i data-lucide="layout-dashboard" class="w-5 h-5 text-white"></i>
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-sm sm:text-base font-bold text-white tracking-tight">Executive Procurement & Datamart Dashboard</h1>
-            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              LIVE GOOGLE SHEET
-            </span>
+  <!-- TOP HEADER / NAV -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Logo & Title -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-100">
+            <i data-lucide="layers" class="w-5 h-5"></i>
           </div>
-          <p class="text-[11px] text-slate-400">Monitoring Kontrak Vendor, Alokasi Anggaran OPEX/CAPEX, Request Datamart & Data Audit Promo</p>
+          <div>
+            <h1 class="font-bold text-base sm:text-lg text-slate-900 leading-tight">Monitoring Pengadaan & Kontrak</h1>
+            <p class="text-xs text-slate-500 flex items-center gap-1.5">
+              <span>Master Data Google Sheets</span>
+              <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <span id="syncStatusBadge" class="text-emerald-700 font-medium">Live Connected</span>
+            </p>
+          </div>
         </div>
-      </div>
 
-      <div class="flex flex-wrap items-center gap-2">
-        <button onclick="openAIModal()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold shadow-md shadow-emerald-950/40 transition active:scale-95 cursor-pointer">
-          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-          <span>AI Insights</span>
-        </button>
-
-        <button onclick="exportCurrentViewCSV()" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-medium transition cursor-pointer" title="Export CSV">
-          <i data-lucide="download" class="w-3.5 h-3.5"></i>
-          <span class="hidden sm:inline">Export</span>
-        </button>
-
-        <button onclick="loadAllData()" id="refreshBtn" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 transition cursor-pointer" title="Refresh Data">
-          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-        </button>
+        <!-- Action Buttons -->
+        <div class="flex items-center gap-2">
+          <button onclick="fetchSheetData()" id="refreshBtn" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors text-slate-700 shadow-xs cursor-pointer">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5 text-slate-500"></i>
+            <span class="hidden sm:inline">Refresh Data</span>
+          </button>
+          <button onclick="exportCSV()" class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors shadow-xs shadow-emerald-200 cursor-pointer">
+            <i data-lucide="download" class="w-3.5 h-3.5"></i>
+            <span>Export CSV</span>
+          </button>
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- MAIN CONTAINER -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 space-y-4">
-
-    <!-- Navigation Tabs (Lengkap 7 Menu Termasuk Data Audit Promo) -->
-    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
-      <div class="flex flex-wrap items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
-        <button onclick="switchTab('overview')" id="tab-overview" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition bg-emerald-600 text-white shadow-xs">
-          <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i>
-          <span>Overview</span>
+  <!-- SUB NAV TABS -->
+  <div class="bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between overflow-x-auto gap-4">
+      <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl text-xs font-medium">
+        <button onclick="switchTab('overview')" id="tabBtn-overview" class="tab-btn px-3 py-1.5 rounded-lg bg-white shadow-xs font-semibold text-slate-900 flex items-center gap-1.5 transition cursor-pointer">
+          <i data-lucide="layout-dashboard" class="w-4 h-4 text-indigo-600"></i>
+          <span>Dashboard & Monitoring</span>
         </button>
-        <button onclick="switchTab('payments')" id="tab-payments" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
-          <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
-          <span>Payment Deadlines</span>
+        <button onclick="switchTab('deadlines')" id="tabBtn-deadlines" class="tab-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition cursor-pointer">
+          <i data-lucide="calendar-alert" class="w-4 h-4 text-amber-500"></i>
+          <span>Jatuh Tempo Pembayaran</span>
         </button>
-        <button onclick="switchTab('quota')" id="tab-quota" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
-          <i data-lucide="database" class="w-3.5 h-3.5"></i>
-          <span>Quota Tracker</span>
-        </button>
-        <button onclick="switchTab('table')" id="tab-table" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
-          <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
-          <span>Procurement Ledger</span>
-        </button>
-        <button onclick="switchTab('anggaran')" id="tab-anggaran" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
-          <i data-lucide="dollar-sign" class="w-3.5 h-3.5 text-emerald-400"></i>
-          <span>Anggaran</span>
-        </button>
-        <button onclick="switchTab('datamart')" id="tab-datamart" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
-          <i data-lucide="folder-git-2" class="w-3.5 h-3.5 text-blue-400"></i>
-          <span>Request Datamart</span>
-        </button>
-        <button onclick="switchTab('audit')" id="tab-audit" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition text-purple-400 hover:text-white">
-          <i data-lucide="shield-check" class="w-3.5 h-3.5 text-purple-400"></i>
-          <span>Data Audit Promo</span>
+        <button onclick="switchTab('quota')" id="tabBtn-quota" class="tab-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition cursor-pointer">
+          <i data-lucide="pie-chart" class="w-4 h-4 text-emerald-600"></i>
+          <span>Kuota & Utilisasi</span>
         </button>
       </div>
 
-      <div id="lastUpdatedBadge" class="text-[11px] text-slate-500 font-mono hidden md:block">
-        Sinkronisasi: Memuat data...
+      <div class="text-xs text-slate-500 hidden sm:flex items-center gap-2">
+        <i data-lucide="clock" class="w-3.5 h-3.5 text-slate-400"></i>
+        <span>Terakhir diperbarui: <strong id="lastUpdatedTime" class="font-semibold text-slate-700">-</strong></span>
       </div>
     </div>
+  </div>
 
-    <!-- 5 KOLOM KPI SECTION (Hanya untuk Overview, Payments, Quota, & Table) -->
-    <section id="procurementKpiSection" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+    <!-- KPI STATS CARDS -->
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3.5 mb-6">
       
-      <!-- 1. Total Nilai Kontrak -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 flex flex-col justify-between shadow-xs">
-        <div class="flex items-center justify-between">
-          <span class="text-[11px] font-bold text-slate-400 uppercase">Total Nilai Kontrak</span>
-          <div class="p-1.5 rounded-lg bg-emerald-950/80 text-emerald-400"><i data-lucide="dollar-sign" class="w-4 h-4"></i></div>
+      <!-- Total Proyek -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-semibold uppercase tracking-wider">Total Proyek</span>
+          <div class="p-1.5 rounded-lg bg-indigo-50 text-indigo-600"><i data-lucide="briefcase" class="w-4 h-4"></i></div>
         </div>
-        <div class="my-1">
-          <div id="kpiTotalCost" class="text-base sm:text-lg font-bold font-mono text-white">Rp 0</div>
-          <div id="kpiBudgetBreakdown" class="text-[10px] text-slate-400 mt-0.5 flex gap-1.5 font-mono"><span>OPEX: -</span> • <span>CAPEX: -</span></div>
-        </div>
-      </div>
-
-      <!-- 2. Total Item Pengadaan -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 flex flex-col justify-between shadow-xs">
-        <div class="flex items-center justify-between">
-          <span class="text-[11px] font-bold text-slate-400 uppercase">Total Item Pengadaan</span>
-          <div class="p-1.5 rounded-lg bg-blue-950/80 text-blue-400"><i data-lucide="layers" class="w-4 h-4"></i></div>
-        </div>
-        <div class="my-1">
-          <div id="kpiTotalItems" class="text-base sm:text-lg font-bold font-mono text-white">0 Item</div>
-          <div id="kpiRkfBreakdown" class="text-[10px] text-emerald-400 font-mono font-bold mt-0.5">RKF: 0 • Non-RKF: 0</div>
+        <div class="text-2xl font-bold text-slate-900" id="kpiTotalProjects">0</div>
+        <div class="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
+          <span id="kpiTahunSummary" class="text-indigo-600 font-medium">Semua Periode</span>
         </div>
       </div>
 
-      <!-- 3. Jatuh Tempo Urgent -->
-      <div onclick="filterByPriority('Urgent')" class="bg-slate-900/90 border border-rose-900/40 hover:border-rose-700/80 rounded-2xl p-3.5 flex flex-col justify-between shadow-xs cursor-pointer transition group">
-        <div class="flex items-center justify-between">
-          <span class="text-[11px] font-bold text-rose-400 uppercase">Jatuh Tempo Urgent</span>
-          <div class="p-1.5 rounded-lg bg-rose-950 text-rose-400 group-hover:scale-110 transition"><i data-lucide="alert-triangle" class="w-4 h-4"></i></div>
+      <!-- Total Anggaran / Cost -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-semibold uppercase tracking-wider">Total Nilai Kontrak</span>
+          <div class="p-1.5 rounded-lg bg-emerald-50 text-emerald-600"><i data-lucide="banknote" class="w-4 h-4"></i></div>
         </div>
-        <div class="my-1">
-          <div id="kpiUrgentCount" class="text-base sm:text-lg font-bold font-mono text-rose-400">0</div>
-          <div class="text-[10px] text-rose-400/80 mt-0.5">≤30 hari / perlu SPK & Adendum</div>
-        </div>
+        <div class="text-xl sm:text-2xl font-bold text-slate-900" id="kpiTotalCost">Rp 0</div>
+        <div class="text-[11px] text-slate-500 mt-1">Akumulasi seluruh paket</div>
       </div>
 
-      <!-- 4. Status On Going -->
-      <div onclick="filterByStatus('On going')" class="bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-2xl p-3.5 flex flex-col justify-between shadow-xs cursor-pointer transition">
-        <div class="flex items-center justify-between">
-          <span class="text-[11px] font-bold text-slate-400 uppercase">Status On going</span>
-          <div class="p-1.5 rounded-lg bg-indigo-950/80 text-indigo-400"><i data-lucide="clock" class="w-4 h-4"></i></div>
+      <!-- Sisa Kuota / Utilisasi -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-semibold uppercase tracking-wider">Rata-rata Utilisasi</span>
+          <div class="p-1.5 rounded-lg bg-blue-50 text-blue-600"><i data-lucide="activity" class="w-4 h-4"></i></div>
         </div>
-        <div class="my-1">
-          <div id="kpiOngoingCount" class="text-base sm:text-lg font-bold font-mono text-indigo-300">0</div>
-          <div class="text-[10px] text-slate-400 mt-0.5">Sedang dalam pelaksanaan</div>
-        </div>
+        <div class="text-2xl font-bold text-slate-900" id="kpiAvgUtilisasi">0%</div>
+        <div class="text-[11px] text-slate-500 mt-1">Dari proyek berkuota</div>
       </div>
 
-      <!-- 5. Status Proyek RKF -->
-      <div onclick="filterByRkfOnly()" class="bg-slate-900/90 border border-emerald-900/40 hover:border-emerald-700/80 rounded-2xl p-3.5 flex flex-col justify-between shadow-xs cursor-pointer transition group">
-        <div class="flex items-center justify-between">
-          <span class="text-[11px] font-bold text-emerald-400 uppercase">Status Proyek RKF</span>
-          <div class="p-1.5 rounded-lg bg-emerald-950 text-emerald-400 group-hover:scale-110 transition"><i data-lucide="target" class="w-4 h-4"></i></div>
+      <!-- Urgent / Due Soon -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs cursor-pointer hover:border-amber-400 transition" onclick="switchTab('deadlines')">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-semibold uppercase tracking-wider">Jatuh Tempo (H-30)</span>
+          <div class="p-1.5 rounded-lg bg-amber-50 text-amber-600"><i data-lucide="alert-triangle" class="w-4 h-4"></i></div>
         </div>
-        <div class="my-1">
-          <div class="flex items-baseline gap-1.5">
-            <span id="kpiRkfOngoing" class="text-base sm:text-lg font-bold font-mono text-emerald-300">0</span>
-            <span class="text-xs font-medium text-slate-400">Berjalan</span>
+        <div class="text-2xl font-bold text-amber-600" id="kpiUrgentDue">0</div>
+        <div class="text-[11px] text-slate-500 mt-1">Perlu pembayaran segera</div>
+      </div>
+
+      <!-- Completed / On-going -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs col-span-2 lg:col-span-1">
+        <div class="flex items-center justify-between text-slate-500 mb-2">
+          <span class="text-xs font-semibold uppercase tracking-wider">Status Proyek</span>
+          <div class="p-1.5 rounded-lg bg-purple-50 text-purple-600"><i data-lucide="check-circle-2" class="w-4 h-4"></i></div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div>
+            <div class="text-lg font-bold text-emerald-600" id="kpiDoneCount">0</div>
+            <div class="text-[10px] text-slate-400 uppercase">Selesai</div>
           </div>
-          <div id="kpiRkfSecondary" class="text-[10px] text-slate-400 mt-0.5 font-mono">
-            <span class="text-amber-400 font-bold" id="kpiRkfPending">0 Belum Mulai</span>
-            <span id="kpiRkfDoneWrapper" class="hidden">• <span class="text-emerald-400 font-bold" id="kpiRkfDone">0 Selesai</span></span>
+          <div class="w-px h-8 bg-slate-200"></div>
+          <div>
+            <div class="text-lg font-bold text-blue-600" id="kpiOngoingCount">0</div>
+            <div class="text-[10px] text-slate-400 uppercase">On-going</div>
           </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VIEW 1: OVERVIEW & MONITORING TABLE -->
+    <section id="view-overview" class="space-y-4">
+      
+      <!-- TOOLBAR: SEARCH & FILTERS (TERMASUK FILTER TAHUN KOLOM D) -->
+      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs space-y-3">
+        
+        <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          
+          <!-- Search input -->
+          <div class="relative flex-1">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input 
+              type="text" 
+              id="searchInput" 
+              oninput="applyFilters()"
+              placeholder="Cari nama proker, task, vendor, PIC, output project, atau tahun..."
+              class="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
+            />
+          </div>
+
+          <!-- Total Showing indicator -->
+          <div class="text-xs text-slate-500 whitespace-nowrap self-center">
+            Menampilkan: <strong id="showingCount" class="text-slate-800 font-bold">0</strong> dari <span id="totalDataCount">0</span> proyek
+          </div>
+        </div>
+
+        <!-- FILTER BAR DENGAN FILTER TAHUN & OUTPUT PROJECT -->
+        <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+          
+          <!-- Filter Tahun (Kolom D di Google Sheet) -->
+          <div class="flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 border border-amber-300 rounded-lg text-xs font-semibold text-amber-900 shadow-2xs">
+            <i data-lucide="calendar" class="w-3.5 h-3.5 text-amber-700"></i>
+            <span>Tahun:</span>
+            <select id="filterTahun" onchange="applyFilters()" class="bg-transparent text-amber-950 font-bold focus:outline-none cursor-pointer">
+              <option value="ALL">Semua Tahun</option>
+            </select>
+          </div>
+
+          <!-- Filter PIC -->
+          <div class="flex items-center gap-1 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-700">
+            <i data-lucide="user" class="w-3 h-3 text-slate-400"></i>
+            <select id="filterPIC" onchange="applyFilters()" class="bg-transparent focus:outline-none cursor-pointer">
+              <option value="ALL">Semua PIC</option>
+            </select>
+          </div>
+
+          <!-- Filter Status -->
+          <div class="flex items-center gap-1 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-700">
+            <i data-lucide="check-square" class="w-3 h-3 text-slate-400"></i>
+            <select id="filterStatus" onchange="applyFilters()" class="bg-transparent focus:outline-none cursor-pointer">
+              <option value="ALL">Semua Status</option>
+              <option value="On going">On going</option>
+              <option value="Done">Done / Selesai</option>
+            </select>
+          </div>
+
+          <!-- Filter Tipe Pengadaan -->
+          <div class="flex items-center gap-1 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-700">
+            <i data-lucide="tag" class="w-3 h-3 text-slate-400"></i>
+            <select id="filterTipe" onchange="applyFilters()" class="bg-transparent focus:outline-none cursor-pointer">
+              <option value="ALL">Semua Tipe</option>
+            </select>
+          </div>
+
+          <!-- Filter RKF -->
+          <div class="flex items-center gap-1 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-700">
+            <i data-lucide="bookmark" class="w-3 h-3 text-slate-400"></i>
+            <select id="filterRKF" onchange="applyFilters()" class="bg-transparent focus:outline-none cursor-pointer">
+              <option value="ALL">Semua RKF</option>
+              <option value="RKF">RKF</option>
+              <option value="Non-RKF">Non-RKF</option>
+            </select>
+          </div>
+
+          <!-- Reset Filter Button -->
+          <button onclick="resetFilters()" class="text-xs text-slate-500 hover:text-slate-800 underline px-2 py-1 ml-auto cursor-pointer">
+            Reset Filter
+          </button>
+        </div>
+
+      </div>
+
+      <!-- TABLE CONTAINER -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs divide-y divide-slate-200">
+            <thead class="bg-slate-50/80 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
+              <tr>
+                <th class="py-3 px-3 w-12 text-center">ID</th>
+                <th class="py-3 px-3 min-w-[200px]">Nama Proker / Task</th>
+                <th class="py-3 px-2 text-center w-20 bg-amber-50/60 text-amber-900 border-x border-amber-100">
+                  <div class="flex items-center justify-center gap-1">
+                    <i data-lucide="calendar" class="w-3 h-3 text-amber-600"></i>
+                    <span>Tahun</span>
+                  </div>
+                </th>
+                <th class="py-3 px-3 min-w-[140px] bg-indigo-50/60 text-indigo-900 border-r border-indigo-100">
+                  <div class="flex items-center gap-1">
+                    <i data-lucide="file-text" class="w-3 h-3 text-indigo-600"></i>
+                    <span>Output Project (Kolom X)</span>
+                  </div>
+                </th>
+                <th class="py-3 px-3 min-w-[130px]">Vendor / PIC</th>
+                <th class="py-3 px-3 text-right min-w-[120px]">Nilai Kontrak</th>
+                <th class="py-3 px-3 text-center min-w-[100px]">Utilisasi</th>
+                <th class="py-3 px-3 text-center min-w-[110px]">End Kontrak</th>
+                <th class="py-3 px-3 text-center w-24">Status</th>
+                <th class="py-3 px-3 text-center w-28">Aksi Detail</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody" class="divide-y divide-slate-100 text-slate-700">
+              <tr>
+                <td colspan="10" class="py-12 text-center text-slate-400">
+                  <div class="flex flex-col items-center justify-center gap-2">
+                    <i data-lucide="loader" class="w-6 h-6 animate-spin text-indigo-500"></i>
+                    <span>Memuat master data...</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
     </section>
 
-    <!-- TAB 1: OVERVIEW -->
-    <div id="view-overview" class="space-y-4">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <!-- Vendor Cost Chart -->
-        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
-          <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
-            <div>
-              <h3 class="text-xs font-bold text-slate-200 uppercase tracking-tight">Alokasi Budgeting per Vendor</h3>
-              <p class="text-[10px] text-slate-400">Total nilai kontrak SPK per vendor mitra</p>
-            </div>
-            <span class="px-2 py-0.5 text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-md">BAR CHART</span>
+    <!-- VIEW 2: DEADLINES & JATUH TEMPO PEMBAYARAN -->
+    <section id="view-deadlines" class="hidden space-y-4">
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-amber-500 text-white flex items-center justify-center">
+            <i data-lucide="alert-triangle" class="w-5 h-5"></i>
           </div>
-          <div class="h-60 relative"><canvas id="vendorChart"></canvas></div>
-        </div>
-
-        <!-- Status Breakdown Chart -->
-        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
-          <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
-            <div>
-              <h3 class="text-xs font-bold text-slate-200 uppercase tracking-tight">Proporsi Status Pelaksanaan Proyek</h3>
-              <p class="text-[10px] text-slate-400">Persentase progres seluruh proyek</p>
-            </div>
-            <span class="px-2 py-0.5 text-[10px] font-mono font-bold bg-blue-500/10 text-blue-400 border border-blue-500/30 rounded-md">PIE CHART</span>
-          </div>
-          <div class="h-60 relative flex items-center justify-center"><canvas id="statusChart"></canvas></div>
-        </div>
-      </div>
-
-      <!-- Quick Deadline Section -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
           <div>
-            <h3 class="text-xs font-bold text-white uppercase tracking-tight">Critical Payment Deadlines & Schedule Kontrak</h3>
-            <p class="text-[11px] text-slate-400">Pantau jatuh tempo dan link dokumen pendukung</p>
+            <h3 class="font-bold text-amber-900 text-sm">Monitoring Jatuh Tempo Kontrak & Pembayaran</h3>
+            <p class="text-xs text-amber-700">Daftar kontrak yang mendekati masa berakhir pembayaran (H-30 hari ke bawah atau urgent).</p>
           </div>
-          <button onclick="switchTab('payments')" class="text-xs font-bold text-emerald-400 hover:underline inline-flex items-center gap-1 cursor-pointer">
-            <span>Lihat Semua Jadwal</span>
-            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-          </button>
         </div>
-
-        <div class="relative w-full">
-          <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400"></i>
-          <input 
-            type="text" 
-            id="overviewSearchInput" 
-            oninput="renderOverviewCards()" 
-            placeholder="Cari jadwal pembayaran berdasarkan vendor, task, proker, PIC, status..." 
-            class="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-emerald-500 transition"
-          >
-        </div>
-
-        <div id="overviewCardsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1"></div>
+        <button onclick="switchTab('overview')" class="text-xs font-semibold text-amber-900 bg-amber-100 hover:bg-amber-200 px-3 py-1.5 rounded-lg transition cursor-pointer">
+          Kembali ke Tabel Utama
+        </button>
       </div>
-    </div>
 
-    <!-- TAB 2: PAYMENT DEADLINES -->
-    <div id="view-payments" class="hidden space-y-4">
-      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="deadlinesCardsGrid">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- VIEW 3: KUOTA & UTILISASI TRACKER -->
+    <section id="view-quota" class="hidden space-y-4">
+      <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center">
+            <i data-lucide="pie-chart" class="w-5 h-5"></i>
+          </div>
           <div>
-            <h2 class="text-sm font-bold text-white uppercase tracking-tight">Schedule & Prioritas Jatuh Tempo Pembayaran</h2>
-            <p class="text-[11px] text-slate-400">Monitoring verifikasi BAST, SPK, status pengerjaan, dan link dokumen penagihan</p>
-          </div>
-          
-          <div class="flex flex-wrap items-center gap-2">
-            <div class="flex items-center gap-1.5 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 shadow-2xs">
-              <span class="text-[10px] font-bold text-slate-400 uppercase">Status:</span>
-              <select id="paymentStatusDropdown" onchange="renderPaymentCards()" class="bg-transparent text-xs font-semibold text-white focus:outline-hidden cursor-pointer">
-                <option value="ALL" class="bg-slate-900 text-white">Semua Status</option>
-              </select>
-            </div>
-
-            <div class="flex items-center gap-1.5 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 shadow-2xs">
-              <span class="text-[10px] font-bold text-slate-400 uppercase">Kategori:</span>
-              <select id="paymentRkfDropdown" onchange="renderPaymentCards()" class="bg-transparent text-xs font-semibold text-white focus:outline-hidden cursor-pointer">
-                <option value="ALL" class="bg-slate-900 text-white">Semua RKF</option>
-                <option value="RKF" class="bg-slate-900 text-emerald-400">Hanya RKF</option>
-                <option value="Non-RKF" class="bg-slate-900 text-slate-300">Hanya Non-RKF</option>
-              </select>
-            </div>
-
-            <div class="flex items-center gap-1.5 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 shadow-2xs">
-              <span class="text-[10px] font-bold text-slate-400 uppercase">Deadline:</span>
-              <select id="paymentPriorityDropdown" onchange="renderPaymentCards()" class="bg-transparent text-xs font-semibold text-white focus:outline-hidden cursor-pointer">
-                <option value="ALL" class="bg-slate-900 text-white">Semua Waktu</option>
-                <option value="Urgent" class="bg-slate-900 text-rose-400">Urgent (≤30 Hari)</option>
-                <option value="Upcoming" class="bg-slate-900 text-amber-400">Soon (31-60 Hari)</option>
-                <option value="Safe" class="bg-slate-900 text-emerald-400">Safe (&gt;60 Hari)</option>
-              </select>
-            </div>
+            <h3 class="font-bold text-blue-900 text-sm">Monitoring Kuota & Utilisasi Layanan</h3>
+            <p class="text-xs text-blue-700">Pantau sisa kuota, total pemakaian, dan status billing paket pengadaan.</p>
           </div>
         </div>
-
-        <div class="relative w-full">
-          <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400"></i>
-          <input 
-            type="text" 
-            id="paymentsSearchInput" 
-            oninput="renderPaymentCards()" 
-            placeholder="Cari nama proker, task, vendor, PIC, RKF, atau status..." 
-            class="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-emerald-500 transition"
-          >
-        </div>
-
-        <div id="paymentCardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-1"></div>
-      </div>
-    </div>
-
-    <!-- TAB 3: QUOTA TRACKER -->
-    <div id="view-quota" class="hidden space-y-4">
-      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
-          <div>
-            <h2 class="text-sm font-bold text-white uppercase tracking-tight">3rd Party API Service Quota & Usage</h2>
-            <p class="text-[11px] text-slate-400">Monitoring kuota OCR KTP, Liveness, Face Compare, & Gateway</p>
-          </div>
-          <span class="px-2.5 py-0.5 text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-md uppercase">QUOTA MONITOR</span>
-        </div>
-        <div id="quotaCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-      </div>
-    </div>
-
-    <!-- TAB 4: PROCUREMENT LEDGER -->
-    <div id="view-table" class="hidden space-y-3">
-      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col md:flex-row gap-2">
-        <div class="relative flex-1">
-          <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400"></i>
-          <input type="text" id="tableSearchInput" oninput="renderMainTable()" placeholder="Cari nama proker, task, vendor, PIC..." class="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-emerald-500">
-        </div>
-        <select id="tableStatusFilter" onchange="renderMainTable()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-hidden">
-          <option value="ALL">Semua Status</option>
-        </select>
-        <select id="tableRkfFilter" onchange="renderMainTable()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-hidden">
-          <option value="ALL">Semua Tipe RKF</option>
-          <option value="RKF">Hanya RKF</option>
-          <option value="Non-RKF">Hanya Non-RKF</option>
-        </select>
+        <button onclick="switchTab('overview')" class="text-xs font-semibold text-blue-900 bg-blue-100 hover:bg-blue-200 px-3 py-1.5 rounded-lg transition cursor-pointer">
+          Kembali ke Tabel Utama
+        </button>
       </div>
 
-      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-        <div class="overflow-x-auto custom-scrollbar">
-          <table class="w-full text-left text-xs text-slate-300">
-            <thead class="bg-slate-950/80 border-b border-slate-800 text-slate-400 uppercase text-[10px] font-bold sticky top-0">
-              <tr>
-                <th class="p-3 w-10 text-center">ID</th>
-                <th class="p-3">Project / Task</th>
-                <th class="p-3">Vendor & PIC</th>
-                <th class="p-3 text-right">Nilai Kontrak</th>
-                <th class="p-3">Schedule</th>
-                <th class="p-3 text-center">Status</th>
-                <th class="p-3 text-center">Dokumen</th>
-                <th class="p-3">Next Action</th>
-                <th class="p-3 text-center">Aksi</th>
-              </tr>
-            </thead>
-            <tbody id="mainTableBody" class="divide-y divide-slate-800/60"></tbody>
-          </table>
-        </div>
-        <div class="p-3 bg-slate-950/60 border-t border-slate-800 flex items-center justify-between text-[11px] font-mono text-slate-400">
-          <span id="tableCountInfo">Memuat...</span>
-          <span>LIVE PROCUREMENT LEDGER</span>
-        </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="quotaCardsGrid">
+        <!-- Rendered via JS -->
       </div>
-    </div>
-
-    <!-- TAB 5: ANGGARAN -->
-    <div id="view-anggaran" class="hidden space-y-4">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-          <span class="text-[11px] font-bold text-slate-400 uppercase">Total Anggaran 2026</span>
-          <div id="kpiAng2026" class="text-xl font-bold font-mono text-emerald-400 mt-1">Rp 0</div>
-          <div id="kpiAngOpexCapex" class="text-[10px] text-slate-500 font-mono mt-1">OPEX: - • CAPEX: -</div>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-          <span class="text-[11px] font-bold text-slate-400 uppercase">Forecasting Cost 2027</span>
-          <div id="kpiAng2027" class="text-xl font-bold font-mono text-blue-400 mt-1">Rp 0</div>
-          <div class="text-[10px] text-slate-500 font-mono mt-1">Estimasi Kebutuhan Biaya</div>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-          <span class="text-[11px] font-bold text-slate-400 uppercase">Kenaikan / Growth</span>
-          <div id="kpiAngGrowth" class="text-xl font-bold font-mono text-purple-400 mt-1">+0.0%</div>
-          <div id="kpiAngDiff" class="text-[10px] text-slate-500 font-mono mt-1">Selisih: +Rp 0</div>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-          <span class="text-[11px] font-bold text-slate-400 uppercase">Total Item Anggaran</span>
-          <div id="kpiAngTotalItems" class="text-xl font-bold font-mono text-white mt-1">0 Item</div>
-          <div class="text-[10px] text-slate-500 font-mono mt-1">Pekerjaan / Brand IT</div>
-        </div>
-      </div>
-
-      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col md:flex-row items-center justify-between gap-3">
-        <div class="relative flex-1 w-full">
-          <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400"></i>
-          <input type="text" id="anggaranSearchInput" oninput="renderAnggaranTable()" placeholder="Cari produk, brand, mata anggaran..." class="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-emerald-500">
-        </div>
-        <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px] font-mono font-bold">
-          <button onclick="setAnggaranFilter('ALL')" id="af-all" class="px-3 py-1 rounded-lg bg-emerald-600 text-white shadow-2xs">SEMUA</button>
-          <button onclick="setAnggaranFilter('OPEX')" id="af-opex" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white">OPEX</button>
-          <button onclick="setAnggaranFilter('CAPEX')" id="af-capex" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white">CAPEX</button>
-        </div>
-      </div>
-
-      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-slate-300">
-            <thead class="bg-slate-950/80 border-b border-slate-800 text-slate-400 uppercase text-[10px] font-bold">
-              <tr>
-                <th class="p-3 w-12 text-center">No</th>
-                <th class="p-3">Produk / Brand / Pekerjaan</th>
-                <th class="p-3 text-center">Tipe Anggaran</th>
-                <th class="p-3 text-center">Mata Anggaran</th>
-                <th class="p-3 text-right">Cost 2026</th>
-                <th class="p-3 text-right">Forecasting Cost 2027</th>
-                <th class="p-3 text-center">Estimasi Pertumbuhan</th>
-              </tr>
-            </thead>
-            <tbody id="anggaranTableBody" class="divide-y divide-slate-800/60 font-sans"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB 6: REQUEST DATAMART -->
-    <div id="view-datamart" class="hidden space-y-4">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-          <span class="text-[11px] font-bold text-slate-400 uppercase">Total Request Datamart</span>
-          <div id="kpiDmTotal" class="text-xl font-bold font-mono text-white mt-1">0 Tiket</div>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-          <span class="text-[11px] font-bold text-emerald-400 uppercase">Done & Table Ready</span>
-          <div id="kpiDmDone" class="text-xl font-bold font-mono text-emerald-400 mt-1">0 Table</div>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-          <span class="text-[11px] font-bold text-amber-400 uppercase">On going / Review</span>
-          <div id="kpiDmProgress" class="text-xl font-bold font-mono text-amber-400 mt-1">0 Tiket</div>
-        </div>
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
-          <span class="text-[11px] font-bold text-rose-400 uppercase">Rejected / Revisi</span>
-          <div id="kpiDmRejected" class="text-xl font-bold font-mono text-rose-400 mt-1">0 Tiket</div>
-        </div>
-      </div>
-
-      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col md:flex-row items-center justify-between gap-3">
-        <div class="relative flex-1 w-full">
-          <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400"></i>
-          <input type="text" id="datamartSearchInput" oninput="renderDatamartTable()" placeholder="Cari ID tiket, nama permintaan, table datamart..." class="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-emerald-500">
-        </div>
-        <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px] font-mono font-bold">
-          <button onclick="setDatamartFilter('ALL')" id="df-all" class="px-3 py-1 rounded-lg bg-emerald-600 text-white">ALL</button>
-          <button onclick="setDatamartFilter('DONE')" id="df-done" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white">DONE</button>
-          <button onclick="setDatamartFilter('IN_PROGRESS')" id="df-prog" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white">PROGRESS</button>
-          <button onclick="setDatamartFilter('REJECTED')" id="df-rej" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white">REJECTED</button>
-        </div>
-      </div>
-
-      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-slate-300">
-            <thead class="bg-slate-950/80 border-b border-slate-800 text-slate-400 uppercase text-[10px] font-bold">
-              <tr>
-                <th class="p-3 w-10 text-center">No</th>
-                <th class="p-3 text-center w-28">ID Tiket</th>
-                <th class="p-3">Nama Permintaan & Output</th>
-                <th class="p-3 text-center">Service Desk</th>
-                <th class="p-3">Status / Table Datamart BigQuery</th>
-                <th class="p-3">Keterangan Status</th>
-              </tr>
-            </thead>
-            <tbody id="datamartTableBody" class="divide-y divide-slate-800/60 font-sans"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB 7: DATA AUDIT PROMO (BERSIH SESUAI GOOGLE SHEET, HANYA KOLOM SEARCH & TABEL) -->
-    <div id="view-audit" class="hidden space-y-4">
-      <!-- Search & Export Controls Only -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl">
-        <div class="relative flex-1 w-full">
-          <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3 text-slate-400"></i>
-          <input 
-            type="text" 
-            id="auditSearchInput" 
-            oninput="renderAuditTable()" 
-            placeholder="Cari promo berdasarkan No, Nama Promo, Deskripsi, atau Kode Promo..." 
-            class="w-full pl-10 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-purple-500 transition shadow-inner"
-          >
-        </div>
-
-        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-          <button 
-            onclick="exportAuditPromoCSV()" 
-            class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition border border-slate-700 shadow-xs cursor-pointer shrink-0" 
-            title="Download CSV Sesuai Kolom Sheet"
-          >
-            <i data-lucide="download" class="w-3.5 h-3.5 text-purple-400"></i>
-            <span>Export CSV</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Tabel Data Audit Promo -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-slate-300">
-            <thead class="bg-slate-950/90 border-b border-slate-800 text-slate-400 uppercase text-[10px] font-bold sticky top-0 tracking-wider">
-              <tr>
-                <th class="p-3.5 w-12 text-center">No</th>
-                <th class="p-3.5 min-w-[200px]">Nama Promo</th>
-                <th class="p-3.5 min-w-[280px]">Deskripsi</th>
-                <th class="p-3.5 min-w-[150px]">Kode Promo</th>
-                <th class="p-3.5 text-center min-w-[130px]">Link Dokumen</th>
-                <th class="p-3.5 text-right min-w-[140px]">Budgeting</th>
-                <th class="p-3.5 text-right min-w-[160px]">Penyerapan Budgeting</th>
-                <th class="p-3.5 text-center w-14">Aksi</th>
-              </tr>
-            </thead>
-            <tbody id="auditTableBody" class="divide-y divide-slate-800/60 font-sans"></tbody>
-          </table>
-        </div>
-
-        <div class="p-3.5 bg-slate-950/80 border-t border-slate-800 flex items-center justify-between text-[11px] font-mono text-slate-400">
-          <span id="auditTableCountInfo">Menampilkan 0 item</span>
-          <span class="text-purple-400 font-bold tracking-wider">DATA AUDIT PROMO</span>
-        </div>
-      </div>
-    </div>
+    </section>
 
   </main>
 
-  <!-- MODAL: PROJECT DETAIL -->
-  <div id="projectDetailModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 hidden">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
-      <div class="flex items-start justify-between p-4 border-b border-slate-800 bg-slate-950/60">
-        <div>
-          <div class="flex items-center gap-2">
-            <span id="modalRkfPill" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border bg-emerald-950 text-emerald-300 border-emerald-800">RKF</span>
-            <span id="modalTipePill" class="text-[10px] font-mono font-bold text-slate-400 uppercase">Eksternal • Vendor</span>
-            <span id="modalStatusBadge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border bg-blue-950 text-blue-300 border-blue-800">On going</span>
-          </div>
-          <h3 id="modalTaskName" class="text-base font-bold text-white mt-1">Nama Proyek</h3>
-          <p id="modalProkerName" class="text-xs text-slate-400">Proker: -</p>
+  <!-- MODAL DETAIL PROYEK (LENGKAP SEMUA KOLOM & OUTPUT PROJECT) -->
+  <div id="detailModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200">
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div class="flex items-center gap-2.5">
+          <span id="modalIdBadge" class="px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-700 text-xs font-bold font-mono">#1</span>
+          <span id="modalTahunBadge" class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-xs font-bold">2026</span>
+          <h3 class="font-bold text-slate-800 text-base">Detail Informasi Proyek</h3>
         </div>
-        <button onclick="closeDetailModal()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
+        <button onclick="closeDetailModal()" class="w-8 h-8 rounded-lg bg-slate-200/60 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition cursor-pointer">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
       </div>
-      <div class="p-4 overflow-y-auto space-y-3 custom-scrollbar text-xs">
-        <div class="grid grid-cols-2 gap-2 font-mono">
-          <div class="p-2.5 bg-slate-950/70 border border-slate-800 rounded-xl">
-            <span class="text-[10px] text-slate-500 font-bold uppercase">Vendor / Mitra</span>
-            <div id="modalVendor" class="font-bold text-slate-200 mt-0.5">-</div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div class="p-6 overflow-y-auto space-y-4 text-xs">
+        
+        <!-- Proker & Task -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200/80">
+          <div class="text-[10px] uppercase font-bold text-slate-400 mb-1">Nama Project / Proker:</div>
+          <div id="modalNamaProker" class="font-bold text-sm text-slate-900 mb-2 leading-snug">-</div>
+          <div class="text-[10px] uppercase font-bold text-slate-400 mb-1">Nama Task:</div>
+          <div id="modalNamaTask" class="text-xs text-slate-700 font-medium leading-relaxed">-</div>
+        </div>
+
+        <!-- Output Project (KOLOM X) Highlight -->
+        <div class="bg-gradient-to-r from-indigo-50 to-purple-50 p-4 rounded-xl border border-indigo-200 flex items-start gap-3">
+          <div class="p-2 rounded-lg bg-indigo-600 text-white shadow-xs">
+            <i data-lucide="file-check-2" class="w-5 h-5"></i>
           </div>
-          <div class="p-2.5 bg-slate-950/70 border border-slate-800 rounded-xl">
-            <span class="text-[10px] text-slate-500 font-bold uppercase">PIC Unit Kerja</span>
-            <div id="modalPic" class="font-bold text-slate-200 mt-0.5">-</div>
-          </div>
-          <div class="p-2.5 bg-slate-950/70 border border-slate-800 rounded-xl">
-            <span class="text-[10px] text-slate-500 font-bold uppercase">Nilai Kontrak (Cost)</span>
-            <div id="modalCost" class="font-bold text-emerald-400 mt-0.5">Rp 0</div>
-          </div>
-          <div class="p-2.5 bg-slate-950/70 border border-slate-800 rounded-xl">
-            <span class="text-[10px] text-slate-500 font-bold uppercase">Jatuh Tempo (End Kontrak)</span>
-            <div id="modalDueDate" class="font-bold text-rose-400 mt-0.5">-</div>
+          <div class="flex-1">
+            <div class="text-[10px] uppercase font-bold text-indigo-700">Output Project (Kolom X):</div>
+            <div id="modalOutputProject" class="text-sm font-bold text-indigo-950 mt-0.5">Dokumen SPK / Output</div>
           </div>
         </div>
-        <div class="p-3 bg-slate-950/80 border border-slate-800 rounded-xl space-y-2">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-1.5 text-slate-300 font-bold"><i data-lucide="file-text" class="w-4 h-4 text-emerald-400"></i><span>Dokumen / Lampiran Proyek</span></div>
-            <div class="flex items-center gap-1.5">
-              <button id="modalCopyBtn" onclick="copyModalLink()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px] font-bold flex items-center gap-1 cursor-pointer">
-                <i data-lucide="copy" class="w-3 h-3"></i>
-                <span id="modalCopyText">Salin URL</span>
-              </button>
-              <a id="modalOpenDocBtn" href="#" target="_blank" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-[10px] font-bold flex items-center gap-1 cursor-pointer">
-                <span>Buka Link</span><i data-lucide="external-link" class="w-3 h-3"></i>
-              </a>
+
+        <!-- Grid 2 Kolom Info Utama -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <div class="text-[10px] text-slate-400 uppercase font-semibold">Vendor</div>
+            <div id="modalVendor" class="font-semibold text-slate-800 mt-1">-</div>
+          </div>
+
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <div class="text-[10px] text-slate-400 uppercase font-semibold">PIC</div>
+            <div id="modalPic" class="font-semibold text-slate-800 mt-1">-</div>
+          </div>
+
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <div class="text-[10px] text-slate-400 uppercase font-semibold">Kategori RKF</div>
+            <div id="modalRkf" class="font-semibold text-slate-800 mt-1">-</div>
+          </div>
+
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <div class="text-[10px] text-slate-400 uppercase font-semibold">Tipe Pengadaan</div>
+            <div id="modalTipePengadaan" class="font-semibold text-slate-800 mt-1">-</div>
+          </div>
+
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <div class="text-[10px] text-slate-400 uppercase font-semibold">Tipe Project</div>
+            <div id="modalTipeProject" class="font-semibold text-slate-800 mt-1">-</div>
+          </div>
+
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <div class="text-[10px] text-slate-400 uppercase font-semibold">Jenis Anggaran</div>
+            <div id="modalJenisAnggaran" class="font-semibold text-slate-800 mt-1">-</div>
+          </div>
+
+        </div>
+
+        <!-- Biaya & Kuota -->
+        <div class="p-4 bg-emerald-50/60 rounded-xl border border-emerald-200">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <div class="text-[10px] text-emerald-800 uppercase font-semibold">Nilai Kontrak / Cost:</div>
+              <div id="modalCost" class="text-lg font-bold text-emerald-950 mt-0.5">Rp 0</div>
+            </div>
+            <div class="text-right">
+              <div class="text-[10px] text-emerald-800 uppercase font-semibold">Utilisasi:</div>
+              <div id="modalUtilisasi" class="text-base font-bold text-emerald-950 mt-0.5">0%</div>
             </div>
           </div>
-          <div id="modalDocPreview" class="p-2 bg-slate-900 border border-slate-800 rounded-lg font-mono text-[10px] text-slate-400 break-all">-</div>
+
+          <!-- Progress Bar -->
+          <div class="w-full bg-emerald-200 rounded-full h-2 mb-2 overflow-hidden">
+            <div id="modalProgressBar" class="bg-emerald-600 h-2 rounded-full transition-all" style="width: 0%"></div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 text-[11px] text-emerald-900 pt-1">
+            <div>Kuota: <strong id="modalKuota" class="font-semibold">-</strong></div>
+            <div>Pemakaian: <strong id="modalTotalPemakaian" class="font-semibold">-</strong></div>
+            <div>Estimasi Habis: <strong id="modalEstimasiHabis" class="font-semibold">-</strong></div>
+          </div>
         </div>
-        <div class="p-3 bg-slate-950/70 border border-slate-800 rounded-xl space-y-1">
-          <span class="text-[10px] text-slate-500 font-bold uppercase">Deskripsi / Progres</span>
-          <p id="modalDesc" class="text-slate-300">-</p>
+
+        <!-- Timeline & Kontrak -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <div class="text-[10px] text-slate-400 uppercase font-semibold">Start Kontrak</div>
+            <div id="modalStartKontrak" class="font-semibold text-slate-800 mt-1">-</div>
+          </div>
+          <div class="p-3 bg-amber-50 rounded-xl border border-amber-200">
+            <div class="text-[10px] text-amber-800 uppercase font-semibold">End Kontrak / Due Date</div>
+            <div id="modalEndKontrak" class="font-semibold text-amber-950 mt-1">-</div>
+          </div>
         </div>
-        <div class="p-3 bg-emerald-950/20 border border-emerald-800/40 rounded-xl space-y-1">
-          <span class="text-[10px] text-emerald-400 font-bold uppercase">Tindakan Selanjutnya (Next Action)</span>
-          <p id="modalNextAction" class="font-medium text-emerald-200">-</p>
+
+        <!-- Status & Prioritas -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <div class="text-[10px] text-slate-400 uppercase font-semibold">Status Pekerjaan</div>
+            <div id="modalStatusBadge" class="inline-block mt-1 font-semibold">-</div>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <div class="text-[10px] text-slate-400 uppercase font-semibold">Prioritas Pembayaran</div>
+            <div id="modalPriorityBadge" class="inline-block mt-1 font-semibold">-</div>
+          </div>
         </div>
+
+        <!-- Deskripsi & Next Action -->
+        <div class="space-y-2">
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <div class="text-[10px] text-slate-400 uppercase font-semibold mb-1">Deskripsi / Catatan</div>
+            <div id="modalDeskripsi" class="text-slate-700 leading-relaxed">-</div>
+          </div>
+          <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+            <div class="text-[10px] text-slate-400 uppercase font-semibold mb-1">Next Action</div>
+            <div id="modalNextAction" class="text-slate-700 leading-relaxed">-</div>
+          </div>
+        </div>
+
+        <!-- Link Dokumen / Detail Action -->
+        <div class="p-3 bg-slate-100 rounded-xl border border-slate-200 flex items-center justify-between">
+          <div class="flex items-center gap-2 text-slate-600">
+            <i data-lucide="link" class="w-4 h-4 text-indigo-500"></i>
+            <span class="text-xs font-medium">Link Dokumen / Lampiran:</span>
+          </div>
+          <div id="modalLinkContainer">
+            <span class="text-xs text-slate-400 italic">Tidak ada link</span>
+          </div>
+        </div>
+
       </div>
-      <div class="p-3 bg-slate-950/80 border-t border-slate-800 flex justify-end">
-        <button onclick="closeDetailModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl cursor-pointer">Tutup</button>
+
+      <!-- Modal Footer -->
+      <div class="px-6 py-3 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+        <span class="text-[11px] text-slate-400">Data bersumber dari Google Sheets Master</span>
+        <button onclick="closeDetailModal()" class="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold transition cursor-pointer">
+          Tutup
+        </button>
       </div>
+
     </div>
   </div>
 
-  <!-- MODAL: DATA AUDIT PROMO DETAIL -->
-  <div id="auditDetailModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 hidden">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-      <div class="flex items-start justify-between p-4 border-b border-slate-800 bg-slate-950/60">
-        <div>
-          <span id="auditModalNoPill" class="px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800 text-[10px] font-mono font-bold">No. 1</span>
-          <h3 id="auditModalName" class="text-base font-bold text-white mt-1.5 leading-snug">Nama Promo</h3>
-        </div>
-        <button onclick="closeAuditModal()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
-      </div>
-      <div class="p-4 overflow-y-auto space-y-3.5 text-xs">
-        <div class="p-3 bg-slate-950/70 border border-slate-800 rounded-xl space-y-1">
-          <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Deskripsi Promo</span>
-          <p id="auditModalDesc" class="text-slate-200 leading-relaxed">-</p>
-        </div>
-
-        <div class="p-3 bg-slate-950/70 border border-slate-800 rounded-xl space-y-1.5">
-          <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Kode Promo</span>
-          <div id="auditModalCodes" class="flex flex-wrap gap-1.5"></div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2.5 font-mono">
-          <div class="p-3 bg-slate-950/70 border border-slate-800 rounded-xl">
-            <span class="text-[10px] text-slate-500 font-bold uppercase">Budgeting</span>
-            <div id="auditModalBudget" class="font-bold text-white text-sm mt-0.5">Rp 0</div>
-          </div>
-          <div class="p-3 bg-slate-950/70 border border-slate-800 rounded-xl">
-            <span class="text-[10px] text-slate-500 font-bold uppercase">Penyerapan Budgeting</span>
-            <div id="auditModalPenyerapan" class="font-bold text-emerald-400 text-sm mt-0.5">Rp 0</div>
-          </div>
-        </div>
-
-        <div id="auditModalProgressWrapper" class="p-3 bg-slate-950/70 border border-slate-800 rounded-xl space-y-2 font-mono">
-          <div class="flex justify-between items-center text-[11px]">
-            <span class="text-slate-400 font-bold">Tingkat Penyerapan Budgeting</span>
-            <span id="auditModalPercent" class="text-emerald-400 font-bold">0%</span>
-          </div>
-          <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-            <div id="auditModalProgressBar" class="h-full bg-emerald-400 rounded-full" style="width: 0%"></div>
-          </div>
-          <div class="flex justify-between text-[10px] text-slate-400">
-            <span id="auditModalTerpakaiLabel">Terpakai: Rp 0</span>
-            <span id="auditModalSisaLabel">Sisa: Rp 0</span>
-          </div>
-        </div>
-
-        <div class="p-3 bg-slate-950/80 border border-slate-800 rounded-xl space-y-2">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-1.5 text-slate-300 font-bold">
-              <i data-lucide="file-text" class="w-4 h-4 text-purple-400"></i>
-              <span>Link Dokumen</span>
-            </div>
-            <div id="auditModalDocActionGroup" class="flex items-center gap-1.5">
-              <button onclick="copyAuditModalLink()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px] font-bold flex items-center gap-1 cursor-pointer">
-                <i data-lucide="copy" class="w-3 h-3"></i>
-                <span id="auditModalCopyText">Salin URL</span>
-              </button>
-              <a id="auditModalOpenDocBtn" href="#" target="_blank" class="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-[10px] font-bold flex items-center gap-1">
-                <span>Buka Drive</span>
-                <i data-lucide="external-link" class="w-3 h-3"></i>
-              </a>
-            </div>
-          </div>
-          <div id="auditModalDocPreview" class="p-2 bg-slate-900 border border-slate-800 rounded-lg font-mono text-[10px] text-slate-400 break-all">-</div>
-        </div>
-      </div>
-      <div class="p-3 bg-slate-950/80 border-t border-slate-800 flex justify-end">
-        <button onclick="closeAuditModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl cursor-pointer">Tutup</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: AI ASSISTANT -->
-  <div id="aiAssistantModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 hidden">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
-      <div class="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-950/60">
-        <div class="flex items-center gap-2"><i data-lucide="sparkles" class="w-5 h-5 text-emerald-400"></i><h3 class="text-sm font-bold text-white">AI Executive Assistant</h3></div>
-        <button onclick="closeAIModal()" class="p-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
-      </div>
-      <div class="p-4 overflow-y-auto space-y-3 custom-scrollbar text-xs">
-        <div class="p-3 bg-emerald-950/30 border border-emerald-800/40 rounded-xl space-y-1">
-          <span class="text-[10px] font-bold text-emerald-400 uppercase">Ringkasan Eksekutif Portfolio</span>
-          <p id="aiSummaryText" class="text-slate-200">Menganalisis pengadaan dan anggaran...</p>
-        </div>
-        <div class="p-3 bg-slate-950 border border-slate-800 rounded-xl space-y-1.5">
-          <span class="text-[10px] font-bold text-rose-400 uppercase">Peringatan Jatuh Tempo & Risiko</span>
-          <ul id="aiRisksList" class="space-y-1 text-slate-300 list-disc list-inside"></ul>
-        </div>
-      </div>
-      <div class="p-3 bg-slate-950/80 border-t border-slate-800 flex justify-end">
-        <button onclick="closeAIModal()" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl cursor-pointer">Tutup</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- JAVASCRIPT LOGIC -->
+  <!-- SCRIPT LOGIKA UTAMA -->
   <script>
-    const GOOGLE_SHEET_ID = '1MgeRBXOfYrK3aN3sMhodMwxmJjX7OOlRqNYOZ-H3gpA';
+    // URL MASTER GOOGLE SHEET (OUTPUT CSV GVIZ)
+    const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/1MgeRBXOfYrK3aN3sMhodMwxmJjX7OOlRqNYOZ-H3gpA/gviz/tq?tqx=out:csv";
 
-    let appData = { procurement: [], anggaran: [], datamart: [], auditPromo: [] };
-    let currentTab = 'overview';
-    let activeAnggaranFilter = 'ALL';
-    let activeDatamartFilter = 'ALL';
+    // Global State
+    let allItems = [];
+    let filteredItems = [];
 
-    let vendorChartInstance = null;
-    let statusChartInstance = null;
-    let currentModalLink = '#';
-    let currentAuditModalLink = '#';
-
-    function formatRupiah(num) {
-      if (!num || num === 0) return 'Rp 0';
-      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+    // Helper: Parse Format Rupiah
+    function formatIDR(val) {
+      if (!val) return 'Rp 0';
+      const numStr = String(val).replace(/[^0-9.-]/g, '');
+      const num = parseFloat(numStr);
+      if (isNaN(num)) return val;
+      return 'Rp ' + Math.round(num).toLocaleString('id-ID');
     }
 
-    function calculatePaymentPriority(endKontrakStr, status) {
+    // Helper: Parse CSV Text dengan handling double-quotes
+    function parseCSV(text) {
+      const lines = text.split(/\r?\n/).filter(line => line.trim().length > 0);
+      if (lines.length === 0) return [];
+
+      const result = [];
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const row = [];
+        let inQuotes = false;
+        let cell = "";
+        
+        for (let j = 0; j < line.length; j++) {
+          const char = line[j];
+          if (char === '"') {
+            if (inQuotes && line[j + 1] === '"') {
+              cell += '"';
+              j++;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (char === ',' && !inQuotes) {
+            row.push(cell.trim());
+            cell = "";
+          } else {
+            cell += char;
+          }
+        }
+        row.push(cell.trim());
+        result.push(row);
+      }
+      return result;
+    }
+
+    // Helper: Hitung Jatuh Tempo Pembayaran
+    function calculatePriority(endKontrakStr, status) {
       if (!status) status = '';
       if (status.toLowerCase().includes('done') || status.toLowerCase().includes('selesai')) {
         return { daysUntilDue: 0, priority: 'Completed' };
       }
-      if (!endKontrakStr || endKontrakStr.trim() === '') {
-        return { daysUntilDue: null, priority: 'Pending' };
+      if (!endKontrakStr || endKontrakStr.trim() === '' || endKontrakStr.trim() === '-') {
+        return { daysUntilDue: null, priority: 'Safe' };
       }
+
       try {
         let cleaned = endKontrakStr.trim()
-          .replace(/Agt/g, 'Aug').replace(/Ags/g, 'Aug').replace(/Des/g, 'Dec')
-          .replace(/Mei/g, 'May').replace(/Okt/g, 'Oct').replace(/Januari/gi, 'Jan')
+          .replace(/Agt/gi, 'Aug').replace(/Ags/gi, 'Aug').replace(/Des/gi, 'Dec')
+          .replace(/Mei/gi, 'May').replace(/Okt/gi, 'Oct').replace(/Januari/gi, 'Jan')
           .replace(/Februari/gi, 'Feb').replace(/Maret/gi, 'Mar').replace(/April/gi, 'Apr')
           .replace(/Juni/gi, 'Jun').replace(/Juli/gi, 'Jul').replace(/Agustus/gi, 'Aug')
           .replace(/September/gi, 'Sep').replace(/Oktober/gi, 'Oct').replace(/November/gi, 'Nov')
           .replace(/Desember/gi, 'Dec');
 
         const parsedDate = new Date(cleaned);
-        if (isNaN(parsedDate.getTime())) return { daysUntilDue: null, priority: 'Pending' };
-
-        const today = new Date('2026-07-31T00:00:00');
+        if (isNaN(parsedDate.getTime())) {
+          return { daysUntilDue: null, priority: 'Safe' };
+        }
+        const today = new Date();
         const diffTime = parsedDate.getTime() - today.getTime();
         const days = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-        if (days < 0 || days <= 30) return { daysUntilDue: days, priority: 'Urgent' };
-        else if (days <= 60) return { daysUntilDue: days, priority: 'Upcoming' };
-        else return { daysUntilDue: days, priority: 'Safe' };
-      } catch {
-        return { daysUntilDue: null, priority: 'Pending' };
+        if (days < 0 || days <= 30) {
+          return { daysUntilDue: days, priority: 'Urgent' };
+        } else if (days <= 60) {
+          return { daysUntilDue: days, priority: 'Upcoming' };
+        } else {
+          return { daysUntilDue: days, priority: 'Safe' };
+        }
+      } catch (e) {
+        return { daysUntilDue: null, priority: 'Safe' };
       }
     }
 
-    function getStatusBadgeHtml(status) {
-      const s = (status || '').toLowerCase();
-      if (s.includes('done') || s.includes('selesai')) {
-        return `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-emerald-950 text-emerald-300 border border-emerald-800">${status || 'Done'}</span>`;
-      } else if (s.includes('hold') || s.includes('not started') || s.includes('belum')) {
-        return `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-amber-950 text-amber-300 border border-amber-800">${status || 'Hold'}</span>`;
-      } else if (s.includes('adendum') || s.includes('tender')) {
-        return `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-purple-950 text-purple-300 border border-purple-800">${status}</span>`;
-      } else {
-        return `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-blue-950 text-blue-300 border border-blue-800">${status || 'On going'}</span>`;
+    // Fetch Data dari Google Sheet
+    async function fetchSheetData() {
+      const refreshBtn = document.getElementById('refreshBtn');
+      if (refreshBtn) refreshBtn.classList.add('animate-pulse');
+
+      const tbody = document.getElementById('tableBody');
+      if (tbody && allItems.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="10" class="py-12 text-center text-slate-400">
+              <div class="flex flex-col items-center justify-center gap-2">
+                <i data-lucide="loader" class="w-6 h-6 animate-spin text-indigo-500"></i>
+                <span>Memuat data dari Google Sheet...</span>
+              </div>
+            </td>
+          </tr>
+        `;
+        lucide.createIcons();
       }
-    }
 
-    function parseCSVLine(line) {
-      const row = [];
-      let inQuotes = false;
-      let current = '';
-      for (let i = 0; i < line.length; i++) {
-        const char = line[i];
-        if (char === '"') inQuotes = !inQuotes;
-        else if (char === ',' && !inQuotes) { row.push(current.trim()); current = ''; }
-        else current += char;
-      }
-      row.push(current.trim());
-      return row;
-    }
+      try {
+        let csvText = "";
+        let res = null;
+        try {
+          res = await fetch('/api/sheet-data');
+          if (res.ok) {
+            const json = await res.json();
+            if (json && json.items && json.items.length > 0) {
+              allItems = json.items;
+              onDataLoaded();
+              return;
+            }
+          }
+        } catch (e) {
+          // Lewati jika running murni static di Vercel tanpa backend
+        }
 
-    function parseNum(val) {
-      if (!val) return 0;
-      let cleaned = String(val).replace(/^"|"$/g, '').replace(/Rp\s?/gi, '').trim();
-      if (cleaned.includes(',') && cleaned.includes('.')) cleaned = cleaned.replace(/,/g, '');
-      else if (cleaned.includes('.')) {
-        if ((cleaned.match(/\./g) || []).length > 1) cleaned = cleaned.replace(/\./g, '');
-      } else if (cleaned.includes(',')) cleaned = cleaned.replace(/,/g, '');
-      const parsed = parseFloat(cleaned);
-      return isNaN(parsed) ? 0 : parsed;
-    }
+        // Langsung ambil CSV dari Google Sheet
+        const sheetRes = await fetch(GOOGLE_SHEET_CSV_URL);
+        if (!sheetRes.ok) throw new Error("Gagal mengambil CSV Google Sheet: " + sheetRes.status);
+        csvText = await sheetRes.text();
 
-    function cleanText(val) {
-      if (val === null || val === undefined) return '';
-      return String(val).replace(/^"|"$/g, '').trim();
-    }
+        const rows = parseCSV(csvText);
+        if (rows.length < 2) {
+          throw new Error("Data Google Sheet kosong.");
+        }
 
-    function cleanUrl(val) {
-      if (!val) return '#';
-      const cleaned = cleanText(val);
-      const m1 = cleaned.match(/HYPERLINK\("([^"]+)"/i);
-      if (m1 && m1[1]) return m1[1];
-      const m2 = cleaned.match(/(https?:\/\/[^\s",)]+)/i);
-      if (m2 && m2[1]) return m2[1];
-      return cleaned || '#';
-    }
-
-    function processRawMatrix(procRows, angRows, dmRows, auditRows) {
-      // 1. Process Procurement
-      if (procRows && procRows.length >= 2) {
-        const headers = procRows[0].map(h => cleanText(h).toLowerCase());
+        const headers = rows[0].map(h => h.toLowerCase().trim());
         
-        const findCol = (patterns) => {
-          for (const p of patterns) {
-            const idx = headers.findIndex(h => h === p || h.startsWith(p));
-            if (idx !== -1) return idx;
+        // Pemetaan Kolom
+        const findIndex = (terms, defaultIdx) => {
+          for (let i = 0; i < headers.length; i++) {
+            for (const t of terms) {
+              if (headers[i].includes(t)) return i;
+            }
           }
-          for (const p of patterns) {
-            const idx = headers.findIndex(h => h.includes(p));
-            if (idx !== -1) return idx;
-          }
-          return -1;
+          return defaultIdx;
         };
 
-        const colId = findCol(['id']) !== -1 ? findCol(['id']) : 0;
-        const colProker = findCol(['nama project', 'proker']) !== -1 ? findCol(['nama project', 'proker']) : 1;
-        const colTask = findCol(['nama task', 'task']) !== -1 ? findCol(['nama task', 'task']) : 2;
-        const colRkf = findCol(['rkf', 'status rkf', 'rkf / non-rkf', 'rkf/non', 'kategori rkf']);
-        const colTipePengadaan = findCol(['tipe pengadaan']) !== -1 ? findCol(['tipe pengadaan']) : 4;
-        const colTipeProject = findCol(['tipe project']) !== -1 ? findCol(['tipe project']) : 5;
-        const colVendor = findCol(['vendor']) !== -1 ? findCol(['vendor']) : 6;
-        const colPic = findCol(['pic']) !== -1 ? findCol(['pic']) : 7;
-        const colJenisAnggaran = findCol(['jenis anggaran']) !== -1 ? findCol(['jenis anggaran']) : 8;
-        const colCost = findCol(['cost', 'biaya', 'nilai']) !== -1 ? findCol(['cost', 'biaya', 'nilai']) : 9;
-        const colKuota = findCol(['kuota']) !== -1 ? findCol(['kuota']) : 10;
-        const colTotalPemakaian = findCol(['total pemakaian', 'pemakaian']) !== -1 ? findCol(['total pemakaian', 'pemakaian']) : 11;
-        const colUtilisasi = findCol(['utlisisasi', 'utilisasi']) !== -1 ? findCol(['utlisisasi', 'utilisasi']) : 12;
-        const colStatusBilling = findCol(['status billing']);
-        const colStartKontrak = findCol(['start kontrak', 'mulai']) !== -1 ? findCol(['start kontrak', 'mulai']) : 15;
-        const colEndKontrakR = headers.findIndex(h => h === 'end kontrak');
-        const colEndKontrakFallback = findCol(['end kontrak', 'selesai', 'jatuh tempo']) !== -1 ? findCol(['end kontrak', 'selesai', 'jatuh tempo']) : 16;
-        const colStatus = headers.findIndex((h, i) => i !== colStatusBilling && (h === 'status' || h.startsWith('status')));
-        const finalStatusIdx = colStatus !== -1 ? colStatus : 18;
-        const colDeskripsi = findCol(['deskripsi', 'keterangan']) !== -1 ? findCol(['deskripsi', 'keterangan']) : 19;
-        const colNextAction = findCol(['next action', 'tindakan']) !== -1 ? findCol(['next action', 'tindakan']) : 20;
-        const colDetailUrl = findCol(['detail', 'link dokumen', 'dokumen', 'link', 'url']) !== -1 ? findCol(['detail', 'link dokumen', 'dokumen', 'link', 'url']) : 21;
+        const colId = findIndex(['id'], 0);
+        const colProker = findIndex(['nama project', 'proker'], 1);
+        const colTask = findIndex(['nama task', 'task'], 2);
+        const colTahun = findIndex(['tahun', 'year'], 3); // KOLOM D (Index 3)
+        const colRkf = findIndex(['rkf'], 4);
+        const colTipePengadaan = findIndex(['tipe pengadaan'], 5);
+        const colTipeProject = findIndex(['tipe project'], 6);
+        const colVendor = findIndex(['vendor'], 7);
+        const colPic = findIndex(['pic'], 8);
+        const colJenisAnggaran = findIndex(['jenis anggaran'], 9);
+        const colCost = findIndex(['cost', 'nilai'], 10);
+        const colKuota = findIndex(['kuota'], 11);
+        const colTotalPemakaian = findIndex(['total pemakaian', 'pemakaian'], 12);
+        const colUtilisasi = findIndex(['utlisisasi', 'utilisasi'], 13);
+        const colStatusBilling = findIndex(['status billing', 'billing'], 14);
+        const colEstimasiHabis = findIndex(['estimasi kuota habis', 'estimasi'], 15);
+        const colStartKontrak = findIndex(['start kontrak', 'start'], 16);
+        const colEndKontrak = findIndex(['end kontrak', 'end'], 17);
+        const colEndSebelumnya = findIndex(['end kontrak sebelumnya'], 18);
+        const colStatus = findIndex(['status'], 19);
+        const colDeskripsi = findIndex(['deskripsi'], 20);
+        const colNextAction = findIndex(['next action', 'action'], 21);
+        const colDetail = findIndex(['detail', 'link'], 22);
+        const colOutputProject = findIndex(['output project', 'output'], 23); // KOLOM X (Index 23)
 
-        appData.procurement = procRows.slice(1).map((r, idx) => {
-          const rawId = cleanText(r[colId]);
-          const proker = cleanText(r[colProker]);
-          const task = cleanText(r[colTask]);
-          const vendor = cleanText(r[colVendor]);
-          const cost = parseNum(r[colCost]);
-          const kuota = cleanText(r[colKuota]) ? parseNum(r[colKuota]) : null;
-          const pemakaian = cleanText(r[colTotalPemakaian]) ? parseNum(r[colTotalPemakaian]) : null;
-          
-          let utilisasi = null;
-          const utRaw = cleanText(r[colUtilisasi]);
-          if (utRaw) utilisasi = parseNum(utRaw.replace('%', ''));
-          else if (kuota && pemakaian) utilisasi = Math.round((pemakaian / kuota) * 100);
+        const parsedItems = [];
+        for (let i = 1; i < rows.length; i++) {
+          const r = rows[i];
+          if (!r || r.length === 0 || (!r[colProker] && !r[colTask])) continue;
 
-          const startKontrak = cleanText(r[colStartKontrak]);
-          const endKontrak = (colEndKontrakR !== -1 ? cleanText(r[colEndKontrakR]) : '') || cleanText(r[colEndKontrakFallback]);
-          const status = cleanText(r[finalStatusIdx]) || 'On going';
-
-          let rkf = 'Non-RKF';
-          const rkfRaw = (colRkf !== -1 ? cleanText(r[colRkf]) : '').toUpperCase();
-          if (rkfRaw.includes('NON') || rkfRaw.includes('BUKAN') || rkfRaw === '-' || rkfRaw === '0' || rkfRaw === 'NO' || rkfRaw === 'TIDAK' || rkfRaw === '') {
-            rkf = 'Non-RKF';
-          } else if (rkfRaw.includes('RKF') || rkfRaw === 'YA' || rkfRaw === 'YES' || rkfRaw === '1') {
-            rkf = 'RKF';
+          // Ekstraksi Tahun (Kolom D fallback ke index 3 atau regex tahun)
+          let tahunVal = r[colTahun] ? r[colTahun].trim() : (r[3] ? r[3].trim() : '');
+          if (!tahunVal) {
+            const m = (r.join(' ')).match(/\b(202[4-9]|203[0-9])\b/);
+            if (m) tahunVal = m[0];
           }
 
-          const { daysUntilDue, priority } = calculatePaymentPriority(endKontrak, status);
+          // Ekstraksi Output Project (Kolom X fallback ke index 23)
+          let outputVal = r[colOutputProject] ? r[colOutputProject].trim() : (r[23] ? r[23].trim() : '');
+          if (!outputVal || outputVal === '-') outputVal = 'Dokumen SPK / Output';
 
-          return {
-            id: rawId || String(idx + 1),
-            namaProker: proker || task || 'Proker / Project',
-            namaTask: task || proker || 'Task / Activity',
-            rkf,
-            tipePengadaan: cleanText(r[colTipePengadaan]) || 'Eksternal',
-            tipeProject: cleanText(r[colTipeProject]) || 'Vendor',
-            vendor: vendor || '-',
-            pic: cleanText(r[colPic]) || 'TBO',
-            cost,
-            kuota,
-            totalPemakaian: pemakaian,
-            utilisasi,
-            startKontrak,
-            endKontrak,
-            jenisAnggaran: cleanText(r[colJenisAnggaran]) || 'OPEX',
-            status,
-            deskripsi: cleanText(r[colDeskripsi]),
-            nextAction: cleanText(r[colNextAction]),
-            detailUrl: cleanUrl(r[colDetailUrl]),
-            daysUntilDue,
-            paymentPriority: priority
-          };
-        }).filter(i => (i.namaTask && !i.namaTask.toLowerCase().includes('total')) || i.vendor !== '-');
+          const endKontrakStr = r[colEndKontrak] || '';
+          const statusStr = r[colStatus] || 'On going';
+          const { daysUntilDue, priority } = calculatePriority(endKontrakStr, statusStr);
+
+          parsedItems.push({
+            id: r[colId] || String(i),
+            namaProker: r[colProker] || r[colTask] || 'Proker / Project',
+            namaTask: r[colTask] || r[colProker] || 'Task / Activity',
+            tahun: tahunVal || '2026',
+            rkf: r[colRkf] || 'RKF',
+            tipePengadaan: r[colTipePengadaan] || 'Eksternal',
+            tipeProject: r[colTipeProject] || 'Vendor',
+            vendor: r[colVendor] || '-',
+            pic: r[colPic] || '-',
+            jenisAnggaran: r[colJenisAnggaran] || '-',
+            cost: r[colCost] || '0',
+            kuota: r[colKuota] || '',
+            totalPemakaian: r[colTotalPemakaian] || '',
+            utilisasi: r[colUtilisasi] || '',
+            statusBilling: r[colStatusBilling] || '',
+            estimasiKuotaHabis: r[colEstimasiHabis] || '',
+            startKontrak: r[colStartKontrak] || '-',
+            endKontrak: endKontrakStr || '-',
+            endKontrakSebelumnya: r[colEndSebelumnya] || '',
+            status: statusStr,
+            deskripsi: r[colDeskripsi] || '-',
+            nextAction: r[colNextAction] || '-',
+            detail: r[colDetail] || '',
+            outputProject: outputVal,
+            daysUntilDue: daysUntilDue,
+            priority: priority
+          });
+        }
+
+        allItems = parsedItems;
+        onDataLoaded();
+
+      } catch (err) {
+        console.error("Gagal load data:", err);
+        if (allItems.length === 0) {
+          useFallbackData();
+        }
+      } finally {
+        if (refreshBtn) refreshBtn.classList.remove('animate-pulse');
+      }
+    }
+
+    // Callback setelah data berhasil dimuat
+    function onDataLoaded() {
+      const timeElem = document.getElementById('lastUpdatedTime');
+      if (timeElem) {
+        const now = new Date();
+        timeElem.textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
       }
 
-      // 2. Process Anggaran
-      if (angRows && angRows.length >= 2) {
-        appData.anggaran = angRows.slice(1).map((r, i) => ({
-          no: cleanText(r[0]) || String(i + 1),
-          produk: cleanText(r[1]) || '-',
-          anggaran: cleanText(r[2]) || 'OPEX',
-          mataAnggaran: cleanText(r[3]) || '-',
-          cost2026: parseNum(r[4]),
-          forecastingCost2027: parseNum(r[5])
-        })).filter(a => a.produk !== '-');
+      populateDropdowns();
+      applyFilters();
+    }
+
+    // Populate Dropdown Filters
+    function populateDropdowns() {
+      // Tahun dropdown (Kolom D)
+      const tahunSelect = document.getElementById('filterTahun');
+      const uniqueYears = Array.from(new Set(allItems.map(i => i.tahun).filter(Boolean))).sort();
+      
+      const currentYearVal = tahunSelect.value;
+      tahunSelect.innerHTML = `<option value="ALL">Semua Tahun</option>`;
+      uniqueYears.forEach(yr => {
+        const opt = document.createElement('option');
+        opt.value = yr;
+        opt.textContent = `Tahun ${yr}`;
+        tahunSelect.appendChild(opt);
+      });
+      if (uniqueYears.includes(currentYearVal)) {
+        tahunSelect.value = currentYearVal;
       }
 
-      // 3. Process Datamart
-      if (dmRows && dmRows.length >= 2) {
-        appData.datamart = dmRows.slice(1).map((r, i) => ({
-          no: cleanText(r[0]) || String(i + 1),
-          idTiket: cleanText(r[1]) || `DM-${i + 1}`,
-          nama: cleanText(r[2]) || '-',
-          output: cleanText(r[3]) || '-',
-          linkTiket: cleanUrl(r[4]),
-          statusTable: cleanText(r[5]) || '-',
-          keteranganStatus: cleanText(r[6]) || '-'
-        })).filter(d => d.nama !== '-');
-      }
+      // PIC dropdown
+      const picSelect = document.getElementById('filterPIC');
+      const uniquePIC = Array.from(new Set(allItems.map(i => i.pic).filter(p => p && p !== '-'))).sort();
+      picSelect.innerHTML = `<option value="ALL">Semua PIC</option>`;
+      uniquePIC.forEach(pic => {
+        const opt = document.createElement('option');
+        opt.value = pic;
+        opt.textContent = pic;
+        picSelect.appendChild(opt);
+      });
 
-      // 4. Process Data Audit Promo (Sesuai Kolom Sheet)
-      if (auditRows && auditRows.length >= 2) {
-        const headers = auditRows[0].map(h => cleanText(h).toLowerCase());
-        const findCol = (patterns) => {
-          for (const p of patterns) {
-            const idx = headers.findIndex(h => h === p || h.startsWith(p));
-            if (idx !== -1) return idx;
+      // Tipe dropdown
+      const tipeSelect = document.getElementById('filterTipe');
+      const uniqueTipe = Array.from(new Set(allItems.map(i => i.tipePengadaan).filter(Boolean))).sort();
+      tipeSelect.innerHTML = `<option value="ALL">Semua Tipe</option>`;
+      uniqueTipe.forEach(tipe => {
+        const opt = document.createElement('option');
+        opt.value = tipe;
+        opt.textContent = tipe;
+        tipeSelect.appendChild(opt);
+      });
+    }
+
+    // Filter Logic
+    function applyFilters() {
+      const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+      const yr = document.getElementById('filterTahun')?.value || 'ALL';
+      const pic = document.getElementById('filterPIC')?.value || 'ALL';
+      const status = document.getElementById('filterStatus')?.value || 'ALL';
+      const tipe = document.getElementById('filterTipe')?.value || 'ALL';
+      const rkf = document.getElementById('filterRKF')?.value || 'ALL';
+
+      filteredItems = allItems.filter(item => {
+        if (q) {
+          const match = 
+            (item.namaProker || '').toLowerCase().includes(q) ||
+            (item.namaTask || '').toLowerCase().includes(q) ||
+            (item.vendor || '').toLowerCase().includes(q) ||
+            (item.pic || '').toLowerCase().includes(q) ||
+            (item.outputProject || '').toLowerCase().includes(q) ||
+            (item.tahun || '').toLowerCase().includes(q);
+          if (!match) return false;
+        }
+
+        if (yr !== 'ALL' && item.tahun !== yr) return false;
+        if (pic !== 'ALL' && item.pic !== pic) return false;
+
+        if (status !== 'ALL') {
+          const isDone = item.status.toLowerCase().includes('done') || item.status.toLowerCase().includes('selesai');
+          if (status === 'Done' && !isDone) return false;
+          if (status === 'On going' && isDone) return false;
+        }
+
+        if (tipe !== 'ALL' && item.tipePengadaan !== tipe) return false;
+
+        if (rkf !== 'ALL') {
+          const isRKF = (item.rkf || '').toUpperCase().includes('RKF') && !(item.rkf || '').toUpperCase().includes('NON');
+          if (rkf === 'RKF' && !isRKF) return false;
+          if (rkf === 'Non-RKF' && isRKF) return false;
+        }
+
+        return true;
+      });
+
+      renderKPIs();
+      renderTable();
+      renderDeadlines();
+      renderQuotaCards();
+    }
+
+    function resetFilters() {
+      if (document.getElementById('searchInput')) document.getElementById('searchInput').value = '';
+      if (document.getElementById('filterTahun')) document.getElementById('filterTahun').value = 'ALL';
+      if (document.getElementById('filterPIC')) document.getElementById('filterPIC').value = 'ALL';
+      if (document.getElementById('filterStatus')) document.getElementById('filterStatus').value = 'ALL';
+      if (document.getElementById('filterTipe')) document.getElementById('filterTipe').value = 'ALL';
+      if (document.getElementById('filterRKF')) document.getElementById('filterRKF').value = 'ALL';
+      applyFilters();
+    }
+
+    // Render KPI Summary
+    function renderKPIs() {
+      const itemsToCount = filteredItems;
+      document.getElementById('kpiTotalProjects').textContent = itemsToCount.length;
+      document.getElementById('showingCount').textContent = itemsToCount.length;
+      document.getElementById('totalDataCount').textContent = allItems.length;
+
+      const yrFilter = document.getElementById('filterTahun')?.value || 'ALL';
+      document.getElementById('kpiTahunSummary').textContent = yrFilter === 'ALL' ? 'Semua Periode' : `Periode ${yrFilter}`;
+
+      let totalCostNum = 0;
+      let totalUtilSum = 0;
+      let utilCount = 0;
+      let urgentCount = 0;
+      let doneCount = 0;
+      let ongoingCount = 0;
+
+      itemsToCount.forEach(i => {
+        const cStr = String(i.cost || '').replace(/[^0-9.-]/g, '');
+        const cVal = parseFloat(cStr);
+        if (!isNaN(cVal)) totalCostNum += cVal;
+
+        if (i.utilisasi) {
+          const uNum = parseFloat(String(i.utilisasi).replace(/%/g, '').trim());
+          if (!isNaN(uNum)) {
+            totalUtilSum += uNum;
+            utilCount++;
           }
-          for (const p of patterns) {
-            const idx = headers.findIndex(h => h.includes(p));
-            if (idx !== -1) return idx;
-          }
-          return -1;
-        };
+        }
 
-        const colNo = findCol(['no', 'id']) !== -1 ? findCol(['no', 'id']) : 0;
-        const colNamaPromo = findCol(['nama promo', 'promo', 'nama']) !== -1 ? findCol(['nama promo', 'promo', 'nama']) : 1;
-        const colDeskripsi = findCol(['deskripsi', 'keterangan']) !== -1 ? findCol(['deskripsi', 'keterangan']) : 2;
-        const colKodePromo = findCol(['kode promo', 'kode']) !== -1 ? findCol(['kode promo', 'kode']) : 3;
-        const colLinkDokumen = findCol(['link dokumen', 'dokumen', 'link', 'url']) !== -1 ? findCol(['link dokumen', 'dokumen', 'link', 'url']) : 4;
-        const colBudgeting = findCol(['budgeting', 'budget', 'anggaran', 'cost']) !== -1 ? findCol(['budgeting', 'budget', 'anggaran', 'cost']) : 5;
-        const colPenyerapan = findCol(['penyerapan budgeting', 'penyerapan', 'realisasi']) !== -1 ? findCol(['penyerapan budgeting', 'penyerapan', 'realisasi']) : 6;
+        if (i.status.toLowerCase().includes('done') || i.status.toLowerCase().includes('selesai')) {
+          doneCount++;
+        } else {
+          ongoingCount++;
+        }
 
-        appData.auditPromo = auditRows.slice(1).map((r, i) => {
-          const no = cleanText(r[colNo]) || String(i + 1);
-          const namaPromo = cleanText(r[colNamaPromo]);
-          const deskripsi = cleanText(r[colDeskripsi]);
-          const kodePromo = cleanText(r[colKodePromo]);
-          const linkDokumen = cleanUrl(r[colLinkDokumen]);
-          const budgeting = parseNum(r[colBudgeting]);
-          const penyerapan = parseNum(r[colPenyerapan]);
-          const persentase = budgeting > 0 ? Math.round((penyerapan / budgeting) * 100) : 0;
-          const sisa = Math.max(0, budgeting - penyerapan);
+        if (i.priority === 'Urgent') {
+          urgentCount++;
+        }
+      });
 
-          return {
-            no,
-            namaPromo,
-            deskripsi,
-            kodePromo,
-            linkDokumen,
-            budgeting,
-            penyerapanBudgeting: penyerapan,
-            persentasePenyerapan: persentase,
-            sisaBudget: sisa
-          };
-        }).filter(a => a.namaPromo && a.namaPromo !== '-' && (a.budgeting > 0 || a.kodePromo !== '-'));
+      document.getElementById('kpiTotalCost').textContent = formatIDR(totalCostNum);
+      document.getElementById('kpiAvgUtilisasi').textContent = utilCount > 0 ? (totalUtilSum / utilCount).toFixed(1) + '%' : '-';
+      document.getElementById('kpiUrgentDue').textContent = urgentCount;
+      document.getElementById('kpiDoneCount').textContent = doneCount;
+      document.getElementById('kpiOngoingCount').textContent = ongoingCount;
+    }
+
+    // Render Table Rows
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      if (!tbody) return;
+
+      if (filteredItems.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="10" class="py-12 text-center text-slate-400">
+              <div class="flex flex-col items-center justify-center gap-2">
+                <i data-lucide="inbox" class="w-8 h-8 text-slate-300"></i>
+                <span class="font-medium">Tidak ada proyek yang sesuai dengan filter pencarian.</span>
+                <button onclick="resetFilters()" class="text-xs text-indigo-600 hover:underline cursor-pointer">Reset semua filter</button>
+              </div>
+            </td>
+          </tr>
+        `;
+        lucide.createIcons();
+        return;
       }
 
+      let html = '';
+      filteredItems.forEach((item) => {
+        const isDone = item.status.toLowerCase().includes('done') || item.status.toLowerCase().includes('selesai');
+        const statusBadge = isDone 
+          ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Done</span>`
+          : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">On going</span>`;
+
+        let utilisasiHtml = '<span class="text-slate-400">-</span>';
+        if (item.utilisasi && item.utilisasi.trim() !== '') {
+          const uNum = parseFloat(String(item.utilisasi).replace(/%/g, ''));
+          const barColor = uNum >= 90 ? 'bg-rose-500' : uNum >= 60 ? 'bg-amber-500' : 'bg-emerald-500';
+          utilisasiHtml = `
+            <div class="flex flex-col items-center gap-1">
+              <span class="font-bold text-slate-800 text-[11px]">${item.utilisasi}</span>
+              <div class="w-14 bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                <div class="${barColor} h-1.5 rounded-full" style="width: ${Math.min(uNum, 100)}%"></div>
+              </div>
+            </div>
+          `;
+        }
+
+        let dueBadge = '';
+        if (item.priority === 'Urgent') {
+          dueBadge = `<span class="block text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded mt-0.5">⚠️ Segera</span>`;
+        }
+
+        html += `
+          <tr class="hover:bg-slate-50/80 transition-colors group cursor-pointer" onclick="handleRowClick(event, '${item.id}')">
+            <td class="py-3 px-3 text-center font-mono font-bold text-slate-400 group-hover:text-indigo-600">${item.id}</td>
+            <td class="py-3 px-3">
+              <div class="font-bold text-slate-900 leading-snug hover:text-indigo-600 transition-colors">${item.namaProker}</div>
+              <div class="text-[11px] text-slate-500 mt-0.5 line-clamp-1">${item.namaTask}</div>
+            </td>
+            <td class="py-3 px-2 text-center bg-amber-50/30 border-x border-amber-100">
+              <span class="inline-block px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 font-bold text-[11px]">
+                ${item.tahun || '2026'}
+              </span>
+            </td>
+            <td class="py-3 px-3 bg-indigo-50/30 border-r border-indigo-100">
+              <div class="flex items-center gap-1.5">
+                <i data-lucide="file-check" class="w-3.5 h-3.5 text-indigo-500 shrink-0"></i>
+                <span class="font-semibold text-slate-800 text-[11px]">${item.outputProject || 'Dokumen SPK'}</span>
+              </div>
+            </td>
+            <td class="py-3 px-3">
+              <div class="font-semibold text-slate-800 truncate max-w-[140px]">${item.vendor || '-'}</div>
+              <div class="text-[10px] text-slate-500 flex items-center gap-1 mt-0.5">
+                <i data-lucide="user" class="w-3 h-3 text-slate-400"></i>
+                <span class="truncate">${item.pic || '-'}</span>
+              </div>
+            </td>
+            <td class="py-3 px-3 text-right font-semibold text-slate-900 whitespace-nowrap">
+              ${formatIDR(item.cost)}
+            </td>
+            <td class="py-3 px-3 text-center">
+              ${utilisasiHtml}
+            </td>
+            <td class="py-3 px-3 text-center whitespace-nowrap">
+              <div class="font-medium text-slate-800 text-[11px]">${item.endKontrak}</div>
+              ${dueBadge}
+            </td>
+            <td class="py-3 px-3 text-center">
+              ${statusBadge}
+            </td>
+            <td class="py-3 px-3 text-center" onclick="event.stopPropagation()">
+              <button 
+                type="button"
+                onclick="openDetailModal('${item.id}')"
+                class="inline-flex items-center justify-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-colors shadow-2xs w-full cursor-pointer"
+                title="Lihat Detail Proyek"
+              >
+                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                <span>Detail</span>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+      lucide.createIcons();
+    }
+
+    function handleRowClick(event, id) {
+      openDetailModal(id);
+    }
+
+    // Render View Deadlines
+    function renderDeadlines() {
+      const container = document.getElementById('deadlinesCardsGrid');
+      if (!container) return;
+
+      const urgentItems = filteredItems.filter(i => i.priority === 'Urgent' || i.priority === 'Upcoming');
+      if (urgentItems.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-3 py-12 text-center text-slate-400 bg-white rounded-xl border border-slate-200">
+            <i data-lucide="check-circle" class="w-8 h-8 text-emerald-500 mx-auto mb-2"></i>
+            <p class="font-medium">Tidak ada proyek yang mendekati jatuh tempo (H-30 hari).</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      let html = '';
+      urgentItems.forEach(i => {
+        html += `
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs hover:border-amber-400 transition cursor-pointer" onclick="openDetailModal('${i.id}')">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-100 px-2 py-0.5 rounded">H-${i.daysUntilDue !== null ? Math.max(i.daysUntilDue, 0) : '0'} Hari</span>
+              <span class="text-xs font-bold text-slate-400">#${i.id} • ${i.tahun}</span>
+            </div>
+            <h4 class="font-bold text-slate-900 text-xs mb-1 line-clamp-2">${i.namaProker}</h4>
+            <div class="text-[11px] text-slate-500 mb-3 line-clamp-1">${i.namaTask}</div>
+            
+            <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-[11px] space-y-1 mb-3">
+              <div class="flex justify-between">
+                <span class="text-slate-400">Output:</span>
+                <span class="font-semibold text-slate-700">${i.outputProject}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Vendor:</span>
+                <span class="font-semibold text-slate-700 truncate max-w-[150px]">${i.vendor}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">End Kontrak:</span>
+                <span class="font-bold text-amber-700">${i.endKontrak}</span>
+              </div>
+            </div>
+
+            <button class="w-full py-1.5 text-xs font-semibold rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition flex items-center justify-center gap-1.5 cursor-pointer">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+              <span>Buka Detail Proyek</span>
+            </button>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      lucide.createIcons();
+    }
+
+    // Render View Quota Cards
+    function renderQuotaCards() {
+      const container = document.getElementById('quotaCardsGrid');
+      if (!container) return;
+
+      const quotaItems = filteredItems.filter(i => i.kuota || i.totalPemakaian || i.utilisasi);
+      if (quotaItems.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-2 py-12 text-center text-slate-400 bg-white rounded-xl border border-slate-200">
+            <i data-lucide="pie-chart" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
+            <p class="font-medium">Tidak ada data kuota / paket pemakaian yang terdata.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      let html = '';
+      quotaItems.forEach(i => {
+        const uNum = parseFloat(String(i.utilisasi || '0').replace(/%/g, '')) || 0;
+        const barColor = uNum >= 90 ? 'bg-rose-500' : uNum >= 60 ? 'bg-amber-500' : 'bg-emerald-500';
+
+        html += `
+          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs hover:border-indigo-400 transition cursor-pointer" onclick="openDetailModal('${i.id}')">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-900">${i.namaProker}</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded">${i.tahun}</span>
+            </div>
+            <div class="text-[11px] text-slate-500 mb-3">${i.namaTask}</div>
+
+            <div class="space-y-2 mb-3">
+              <div class="flex justify-between text-xs">
+                <span class="text-slate-500">Utilisasi:</span>
+                <span class="font-bold text-slate-800">${i.utilisasi || '0%'}</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                <div class="${barColor} h-2 rounded-full" style="width: ${Math.min(uNum, 100)}%"></div>
+              </div>
+              <div class="grid grid-cols-2 text-[11px] text-slate-600 pt-1">
+                <div>Kuota: <strong>${i.kuota || '-'}</strong></div>
+                <div class="text-right">Pemakaian: <strong>${i.totalPemakaian || '-'}</strong></div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] text-slate-500 border-t border-slate-100 pt-2">
+              <span>Output: <strong>${i.outputProject}</strong></span>
+              <span class="text-indigo-600 font-semibold hover:underline">Lihat Detail →</span>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      lucide.createIcons();
+    }
+
+    // MODAL DETAIL CONTROLLER
+    function openDetailModal(id) {
+      const item = allItems.find(i => String(i.id) === String(id));
+      if (!item) return;
+
+      document.getElementById('modalIdBadge').textContent = '#' + item.id;
+      document.getElementById('modalTahunBadge').textContent = item.tahun || '2026';
+      document.getElementById('modalNamaProker').textContent = item.namaProker || '-';
+      document.getElementById('modalNamaTask').textContent = item.namaTask || '-';
+      document.getElementById('modalOutputProject').textContent = item.outputProject || 'Dokumen SPK';
+
+      document.getElementById('modalVendor').textContent = item.vendor || '-';
+      document.getElementById('modalPic').textContent = item.pic || '-';
+      document.getElementById('modalRkf').textContent = item.rkf || 'RKF';
+      document.getElementById('modalTipePengadaan').textContent = item.tipePengadaan || '-';
+      document.getElementById('modalTipeProject').textContent = item.tipeProject || '-';
+      document.getElementById('modalJenisAnggaran').textContent = item.jenisAnggaran || '-';
+
+      document.getElementById('modalCost').textContent = formatIDR(item.cost);
+      document.getElementById('modalUtilisasi').textContent = item.utilisasi || '0%';
+
+      const uNum = parseFloat(String(item.utilisasi || '0').replace(/%/g, '')) || 0;
+      document.getElementById('modalProgressBar').style.width = Math.min(uNum, 100) + '%';
+      
+      document.getElementById('modalKuota').textContent = item.kuota || '-';
+      document.getElementById('modalTotalPemakaian').textContent = item.totalPemakaian || '-';
+      document.getElementById('modalEstimasiHabis').textContent = item.estimasiKuotaHabis || '-';
+
+      document.getElementById('modalStartKontrak').textContent = item.startKontrak || '-';
+      document.getElementById('modalEndKontrak').textContent = item.endKontrak || '-';
+
+      const isDone = item.status.toLowerCase().includes('done') || item.status.toLowerCase().includes('selesai');
+      document.getElementById('modalStatusBadge').innerHTML = isDone 
+        ? `<span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">Done / Selesai</span>`
+        : `<span class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-xs font-bold">On going</span>`;
+
+      document.getElementById('modalPriorityBadge').innerHTML = item.priority === 'Urgent'
+        ? `<span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-bold">⚠️ Urgent (H-30)</span>`
+        : `<span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">Safe / Terkendali</span>`;
+
+      document.getElementById('modalDeskripsi').textContent = item.deskripsi || '-';
+      document.getElementById('modalNextAction').textContent = item.nextAction || '-';
+
+      // Link Dokumen
+      const linkBox = document.getElementById('modalLinkContainer');
+      if (item.detail && item.detail.trim().length > 3 && item.detail !== '-') {
+        let cleanUrl = item.detail.trim();
+        if (!cleanUrl.startsWith('http')) cleanUrl = 'https://' + cleanUrl;
+        linkBox.innerHTML = `
+          <a href="${cleanUrl}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs transition">
+            <span>Buka Dokumen / Link Detail</span>
+            <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+          </a>
+        `;
+      } else {
+        linkBox.innerHTML = `<span class="text-xs text-slate-400 italic">Tidak ada link lampiran</span>`;
+      }
+
+      document.getElementById('detailModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+    }
+
+    // Switch Tabs Navigation
+    function switchTab(tabId) {
+      const views = ['overview', 'deadlines', 'quota'];
+      views.forEach(v => {
+        const viewElem = document.getElementById('view-' + v);
+        const btnElem = document.getElementById('tabBtn-' + v);
+        if (v === tabId) {
+          viewElem.classList.remove('hidden');
+          btnElem.className = 'tab-btn px-3 py-1.5 rounded-lg bg-white shadow-xs font-semibold text-slate-900 flex items-center gap-1.5 transition cursor-pointer';
+        } else {
+          viewElem.classList.add('hidden');
+          btnElem.className = 'tab-btn px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition cursor-pointer';
+        }
+      });
+      lucide.createIcons();
+    }
+
+    // Export Data ke CSV
+    function exportCSV() {
+      if (filteredItems.length === 0) {
+        alert("Tidak ada data untuk diekspor.");
+        return;
+      }
+
+      const headers = [
+        "ID", "Nama Proker", "Nama Task", "Tahun (Kolom D)", "RKF", "Tipe Pengadaan", "Tipe Project",
+        "Vendor", "PIC", "Jenis Anggaran", "Cost", "Kuota", "Total Pemakaian", "Utilisasi",
+        "Start Kontrak", "End Kontrak", "Status", "Output Project (Kolom X)", "Deskripsi", "Next Action"
+      ];
+
+      const csvRows = [headers.join(",")];
+      filteredItems.forEach(i => {
+        const row = [
+          i.id,
+          `"${(i.namaProker || '').replace(/"/g, '""')}"`,
+          `"${(i.namaTask || '').replace(/"/g, '""')}"`,
+          i.tahun || '',
+          i.rkf || '',
+          i.tipePengadaan || '',
+          i.tipeProject || '',
+          `"${(i.vendor || '').replace(/"/g, '""')}"`,
+          `"${(i.pic || '').replace(/"/g, '""')}"`,
+          `"${(i.jenisAnggaran || '').replace(/"/g, '""')}"`,
+          i.cost || '',
+          i.kuota || '',
+          i.totalPemakaian || '',
+          i.utilisasi || '',
+          i.startKontrak || '',
+          i.endKontrak || '',
+          i.status || '',
+          `"${(i.outputProject || '').replace(/"/g, '""')}"`,
+          `"${(i.deskripsi || '').replace(/"/g, '""')}"`,
+          `"${(i.nextAction || '').replace(/"/g, '""')}"`,
+        ];
+        csvRows.push(row.join(","));
+      });
+
+      const blob = new Blob([csvRows.join("\n")], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Monitoring_Pengadaan_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // Data Fallback jika offline
+    function useFallbackData() {
+      allItems = [
+        {
+          id: "1",
+          namaProker: "Enhancing User Engagement and Satisfaction pada aplikasi Tring (Android & IOS)",
+          namaTask: "Enhancing User Engagement and Satisfaction pada Aplikasi Tring!",
+          tahun: "2026",
+          rkf: "RKF",
+          tipePengadaan: "Eksternal",
+          tipeProject: "Vendor",
+          vendor: "I3 / PT. Inovasi Informatika Indonesia",
+          pic: "Pengadaan & Logistic",
+          jenisAnggaran: "OPEX 2026",
+          cost: "4873455000",
+          kuota: "-",
+          totalPemakaian: "-",
+          utilisasi: "-",
+          startKontrak: "1/4/2026",
+          endKontrak: "30/9/2026",
+          status: "On going",
+          deskripsi: "Review SPK",
+          nextAction: "Proses tanda tangan SPK",
+          outputProject: "Dokumen SPK",
+          daysUntilDue: 60,
+          priority: "Upcoming"
+        }
+      ];
       onDataLoaded();
     }
 
-    async function loadAllData() {
-      const refreshBtn = document.getElementById('refreshBtn');
-      if (refreshBtn) refreshBtn.classList.add('animate-spin');
-
-      // Dukungan Google Apps Script Runner jika ada
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run
-          .withSuccessHandler(function(res) {
-            if (res && res.success) {
-              processRawMatrix(res.procurementRaw, res.anggaranRaw, res.datamartRaw, res.auditRaw);
-            } else {
-              fallbackDirectCsv();
-            }
-            if (refreshBtn) refreshBtn.classList.remove('animate-spin');
-          })
-          .withFailureHandler(function(err) {
-            console.warn('Apps Script runner failed, fallback to direct CSV:', err);
-            fallbackDirectCsv();
-            if (refreshBtn) refreshBtn.classList.remove('animate-spin');
-          })
-          .getDashboardData();
-        return;
-      }
-
-      // Direct Live CSV Fetch untuk GitHub Pages / Vercel
-      await fallbackDirectCsv();
-      if (refreshBtn) refreshBtn.classList.remove('animate-spin');
-    }
-
-    async function fallbackDirectCsv() {
-      try {
-        const procUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv`;
-        const angUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Anggaran`;
-        const dmUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Request%20Datamart`;
-        const auditUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Data%20Audit%20Promo`;
-
-        const [rProc, rAng, rDm, rAudit] = await Promise.all([
-          fetch(procUrl).then(r => r.text()),
-          fetch(angUrl).then(r => r.text()).catch(() => ''),
-          fetch(dmUrl).then(r => r.text()).catch(() => ''),
-          fetch(auditUrl).then(r => r.text()).catch(() => '')
-        ]);
-
-        const pLines = rProc.split('\n').filter(l => l.trim().length > 0).map(parseCSVLine);
-        const aLines = rAng ? rAng.split('\n').filter(l => l.trim().length > 0).map(parseCSVLine) : [];
-        const dLines = rDm ? rDm.split('\n').filter(l => l.trim().length > 0).map(parseCSVLine) : [];
-        const audLines = rAudit ? rAudit.split('\n').filter(l => l.trim().length > 0).map(parseCSVLine) : [];
-
-        processRawMatrix(pLines, aLines, dLines, audLines);
-      } catch (e) {
-        console.error("Gagal membaca Google Sheet:", e);
-        document.getElementById('lastUpdatedBadge').innerText = "Gagal memuat Google Sheet secara langsung.";
-      }
-    }
-
-    function populateStatusDropdowns() {
-      const statuses = Array.from(new Set(appData.procurement.map(i => (i.status || '').trim()).filter(Boolean)));
-      
-      const paymentDropdown = document.getElementById('paymentStatusDropdown');
-      if (paymentDropdown) {
-        const curVal = paymentDropdown.value;
-        paymentDropdown.innerHTML = `<option value="ALL" class="bg-slate-900 text-white">Semua Status (${appData.procurement.length})</option>` +
-          statuses.map(st => {
-            const count = appData.procurement.filter(i => (i.status || '').toLowerCase() === st.toLowerCase()).length;
-            return `<option value="${st}" class="bg-slate-900 text-slate-200">${st} (${count})</option>`;
-          }).join('');
-        paymentDropdown.value = curVal || 'ALL';
-      }
-
-      const tableDropdown = document.getElementById('tableStatusFilter');
-      if (tableDropdown) {
-        const curVal = tableDropdown.value;
-        tableDropdown.innerHTML = `<option value="ALL">Semua Status</option>` +
-          statuses.map(st => `<option value="${st}">${st}</option>`).join('');
-        tableDropdown.value = curVal || 'ALL';
-      }
-    }
-
-    function onDataLoaded() {
-      document.getElementById('lastUpdatedBadge').innerText = `Sinkronisasi: ${new Date().toLocaleTimeString('id-ID')} WIB (Live)`;
-      populateStatusDropdowns();
-      updateProcurementKPI();
-      renderOverviewCards();
-      renderPaymentCards();
-      renderQuotaCards();
-      renderMainTable();
-      renderCharts();
-      renderAnggaranTab();
-      renderDatamartTab();
-      renderAuditTable();
-      lucide.createIcons();
-    }
-
-    function switchTab(tabId) {
-      currentTab = tabId;
-      const tabs = ['overview', 'payments', 'quota', 'table', 'anggaran', 'datamart', 'audit'];
-      tabs.forEach(t => {
-        const viewEl = document.getElementById(`view-${t}`);
-        if (viewEl) viewEl.classList.add('hidden');
-        const btn = document.getElementById(`tab-${t}`);
-        if (btn) btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white';
-      });
-
-      const activeView = document.getElementById(`view-${tabId}`);
-      if (activeView) activeView.classList.remove('hidden');
-
-      const activeBtn = document.getElementById(`tab-${tabId}`);
-      if (activeBtn) {
-        if (tabId === 'audit') {
-          activeBtn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition bg-purple-600 text-white shadow-xs';
-        } else {
-          activeBtn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition bg-emerald-600 text-white shadow-xs';
-        }
-      }
-
-      const procKpi = document.getElementById('procurementKpiSection');
-      if (['anggaran', 'datamart', 'audit'].includes(tabId)) {
-        procKpi.classList.add('hidden');
-      } else {
-        procKpi.classList.remove('hidden');
-      }
-
-      lucide.createIcons();
-    }
-
-    function updateProcurementKPI() {
-      const items = appData.procurement;
-      const totalCost = items.reduce((s, i) => s + (i.cost || 0), 0);
-      const opexCost = items.filter(i => (i.jenisAnggaran || '').toUpperCase().includes('OPEX')).reduce((s, i) => s + (i.cost || 0), 0);
-      const capexCost = items.filter(i => (i.jenisAnggaran || '').toUpperCase().includes('CAPEX')).reduce((s, i) => s + (i.cost || 0), 0);
-
-      document.getElementById('kpiTotalCost').innerText = formatRupiah(totalCost);
-      document.getElementById('kpiBudgetBreakdown').innerHTML = `<span>OPEX: ${formatRupiah(opexCost)}</span> • <span>CAPEX: ${formatRupiah(capexCost)}</span>`;
-      document.getElementById('kpiTotalItems').innerText = `${items.length} Item`;
-
-      const rkfItems = items.filter(i => i.rkf === 'RKF');
-      const rkfCount = rkfItems.length;
-      const nonRkfCount = items.length - rkfCount;
-      document.getElementById('kpiRkfBreakdown').innerText = `RKF: ${rkfCount} • Non-RKF: ${nonRkfCount}`;
-
-      const urgentCount = items.filter(i => i.paymentPriority === 'Urgent').length;
-      document.getElementById('kpiUrgentCount').innerText = urgentCount;
-
-      const ongoingCount = items.filter(i => (i.status || '').toLowerCase().includes('on going') || (i.status || '').toLowerCase().includes('ongoing')).length;
-      document.getElementById('kpiOngoingCount').innerText = ongoingCount;
-
-      const rkfOngoing = rkfItems.filter(i => (i.status || '').toLowerCase().includes('on going') || (i.status || '').toLowerCase().includes('ongoing')).length;
-      const rkfDone = rkfItems.filter(i => (i.status || '').toLowerCase().includes('done') || (i.status || '').toLowerCase().includes('selesai')).length;
-      const rkfNotStarted = rkfItems.filter(i => (i.status || '').toLowerCase().includes('hold') || (i.status || '').toLowerCase().includes('not started') || (i.status || '').toLowerCase().includes('belum')).length || Math.max(0, rkfCount - rkfOngoing - rkfDone);
-
-      document.getElementById('kpiRkfOngoing').innerText = rkfOngoing;
-      document.getElementById('kpiRkfPending').innerText = `${rkfNotStarted} Belum Mulai`;
-
-      const doneWrapper = document.getElementById('kpiRkfDoneWrapper');
-      if (rkfDone > 0) {
-        doneWrapper.classList.remove('hidden');
-        document.getElementById('kpiRkfDone').innerText = `${rkfDone} Selesai`;
-      } else {
-        doneWrapper.classList.add('hidden');
-      }
-    }
-
-    function getCardHtml(item) {
-      const isUrgent = item.paymentPriority === 'Urgent';
-      const isUpcoming = item.paymentPriority === 'Upcoming';
-      const isRkf = item.rkf === 'RKF';
-      const borderClass = isUrgent ? 'border-l-4 border-l-rose-500 bg-rose-950/10' : (isUpcoming ? 'border-l-4 border-l-amber-500 bg-amber-950/10' : 'border-l-4 border-l-emerald-500');
-
-      return `
-        <div class="bg-slate-900/90 border border-slate-800 ${borderClass} rounded-xl p-3.5 flex flex-col justify-between hover:border-slate-700 transition">
-          <div>
-            <div class="flex items-center justify-between gap-1 mb-1.5">
-              <span class="text-xs font-bold text-white truncate">${item.vendor || 'In-House'}</span>
-              <div class="flex items-center gap-1">
-                <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase ${isRkf ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-slate-800 text-slate-400 border border-slate-700'}">${item.rkf || 'Non-RKF'}</span>
-                ${getStatusBadgeHtml(item.status)}
-              </div>
-            </div>
-            <h4 class="text-xs font-bold text-slate-200 line-clamp-1">${item.namaTask}</h4>
-            <p class="text-[10px] text-slate-400 line-clamp-1 mb-2">${item.namaProker}</p>
-            <div class="space-y-1 py-2 border-y border-slate-800 font-mono text-[11px]">
-              <div class="flex justify-between"><span class="text-slate-500">Nilai:</span><span class="font-bold text-emerald-400">${formatRupiah(item.cost)}</span></div>
-              <div class="flex justify-between"><span class="text-slate-500">Start:</span><span class="text-slate-300">${item.startKontrak || '-'}</span></div>
-              <div class="flex justify-between"><span class="text-rose-400 font-bold">Due Date:</span><span class="font-bold text-rose-400">${item.endKontrak || '-'}</span></div>
-            </div>
-          </div>
-          <div class="mt-2.5 pt-1 flex items-center justify-between gap-1">
-            <div class="truncate flex-1 text-[10px] text-slate-400"><span class="font-bold uppercase text-slate-500">Next:</span> ${item.nextAction || '-'}</div>
-            <div class="flex items-center gap-1 shrink-0">
-              ${item.detailUrl && item.detailUrl !== '#' ? `
-                <a href="${item.detailUrl}" target="_blank" class="p-1 rounded bg-slate-800 hover:bg-slate-700 text-blue-400" title="Buka Dokumen"><i data-lucide="file-text" class="w-3.5 h-3.5"></i></a>
-              ` : ''}
-              <button onclick="openDetailModal('${item.id}')" class="px-2 py-1 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 rounded text-[10px] font-bold flex items-center gap-0.5 cursor-pointer">
-                <span>Detail</span><i data-lucide="chevron-right" class="w-3 h-3"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function renderOverviewCards() {
-      const search = (document.getElementById('overviewSearchInput')?.value || '').toLowerCase();
-      const filtered = appData.procurement.filter(item => {
-        return !search ||
-          (item.namaProker && item.namaProker.toLowerCase().includes(search)) ||
-          (item.namaTask && item.namaTask.toLowerCase().includes(search)) ||
-          (item.vendor && item.vendor.toLowerCase().includes(search)) ||
-          (item.pic && item.pic.toLowerCase().includes(search)) ||
-          (item.rkf && item.rkf.toLowerCase().includes(search)) ||
-          (item.status && item.status.toLowerCase().includes(search));
-      });
-
-      const container = document.getElementById('overviewCardsGrid');
-      if (!container) return;
-
-      if (!filtered.length) {
-        container.innerHTML = `<div class="col-span-full py-8 text-center text-xs text-slate-500">Tidak ada jadwal kontrak yang cocok.</div>`;
-        return;
-      }
-
-      const displayItems = search ? filtered : filtered.slice(0, 3);
-      container.innerHTML = displayItems.map(getCardHtml).join('');
-      lucide.createIcons();
-    }
-
-    function renderPaymentCards() {
-      const search = (document.getElementById('paymentsSearchInput')?.value || '').toLowerCase();
-      const statusVal = document.getElementById('paymentStatusDropdown')?.value || 'ALL';
-      const rkfVal = document.getElementById('paymentRkfDropdown')?.value || 'ALL';
-      const priorityVal = document.getElementById('paymentPriorityDropdown')?.value || 'ALL';
-
-      const filtered = appData.procurement.filter(item => {
-        const matchSearch = !search ||
-          (item.namaProker && item.namaProker.toLowerCase().includes(search)) ||
-          (item.namaTask && item.namaTask.toLowerCase().includes(search)) ||
-          (item.vendor && item.vendor.toLowerCase().includes(search)) ||
-          (item.pic && item.pic.toLowerCase().includes(search)) ||
-          (item.rkf && item.rkf.toLowerCase().includes(search)) ||
-          (item.status && item.status.toLowerCase().includes(search));
-
-        const matchStatus = statusVal === 'ALL' || (item.status && item.status.toLowerCase() === statusVal.toLowerCase());
-        const matchRkf = rkfVal === 'ALL' || item.rkf === rkfVal;
-        const matchPri = priorityVal === 'ALL' || item.paymentPriority === priorityVal;
-
-        return matchSearch && matchStatus && matchRkf && matchPri;
-      });
-
-      const container = document.getElementById('paymentCardsGrid');
-      if (!container) return;
-
-      if (!filtered.length) {
-        container.innerHTML = `<div class="col-span-full py-8 text-center text-xs text-slate-500">Tidak ada jadwal yang cocok dengan kriteria filter.</div>`;
-        return;
-      }
-
-      container.innerHTML = filtered.map(getCardHtml).join('');
-      lucide.createIcons();
-    }
-
-    function renderQuotaCards() {
-      const container = document.getElementById('quotaCardsGrid');
-      const quotaItems = appData.procurement.filter(i => i.kuota !== null && i.kuota > 0);
-      if (!quotaItems.length) {
-        container.innerHTML = `<div class="col-span-full py-8 text-center text-xs text-slate-500">Belum ada item kuota API.</div>`;
-        return;
-      }
-      container.innerHTML = quotaItems.map(item => {
-        const usage = item.utilisasi || 0;
-        const isOver = usage >= 100;
-        return `
-          <div class="bg-slate-900 border ${isOver ? 'border-rose-800/80 bg-rose-950/10' : 'border-slate-800'} rounded-2xl p-4 space-y-2">
-            <div class="flex items-center justify-between">
-              <h4 class="text-xs font-bold text-white line-clamp-1">${item.namaTask}</h4>
-              <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded ${isOver ? 'bg-rose-900 text-rose-200' : 'bg-emerald-950 text-emerald-300'}">${usage}%</span>
-            </div>
-            <div class="text-[10px] text-slate-400 font-mono">Vendor: ${item.vendor}</div>
-            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-              <div class="h-full rounded-full ${isOver ? 'bg-rose-500' : 'bg-emerald-500'}" style="width: ${Math.min(usage, 100)}%"></div>
-            </div>
-            <div class="flex justify-between text-[10px] font-mono text-slate-400 pt-1">
-              <span>Kuota: ${Number(item.kuota).toLocaleString('id-ID')}</span>
-              <span>Pakai: ${Number(item.totalPemakaian || 0).toLocaleString('id-ID')}</span>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderMainTable() {
-      const search = (document.getElementById('tableSearchInput')?.value || '').toLowerCase();
-      const statusFilter = document.getElementById('tableStatusFilter')?.value || 'ALL';
-      const rkfFilter = document.getElementById('tableRkfFilter')?.value || 'ALL';
-
-      const filtered = appData.procurement.filter(item => {
-        const matchSearch = !search ||
-          (item.namaProker && item.namaProker.toLowerCase().includes(search)) ||
-          (item.namaTask && item.namaTask.toLowerCase().includes(search)) ||
-          (item.vendor && item.vendor.toLowerCase().includes(search)) ||
-          (item.pic && item.pic.toLowerCase().includes(search));
-
-        const matchStatus = statusFilter === 'ALL' || (item.status && item.status.toLowerCase().includes(statusFilter.toLowerCase()));
-        const matchRkf = rkfFilter === 'ALL' || item.rkf === rkfFilter;
-        return matchSearch && matchStatus && matchRkf;
-      });
-
-      const tbody = document.getElementById('mainTableBody');
-      if (!tbody) return;
-
-      if (!filtered.length) {
-        tbody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-xs text-slate-500">Tidak ada data yang cocok dengan kriteria filter.</td></tr>`;
-        document.getElementById('tableCountInfo').innerText = `Menampilkan 0 dari ${appData.procurement.length} item`;
-        return;
-      }
-
-      tbody.innerHTML = filtered.map(item => {
-        const isUrgent = item.paymentPriority === 'Urgent';
-        const hasUrl = item.detailUrl && item.detailUrl !== '#';
-        const isRkf = item.rkf === 'RKF';
-
-        return `
-          <tr class="hover:bg-slate-800/40 transition">
-            <td class="p-3 text-center font-mono font-bold text-slate-500">${item.id}</td>
-            <td class="p-3 max-w-xs">
-              <div class="font-bold text-slate-100 line-clamp-1">${item.namaTask}</div>
-              <div class="text-[10px] text-slate-400 line-clamp-1">${item.namaProker}</div>
-              <div class="flex gap-1 mt-1">
-                <span class="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded ${isRkf ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-slate-800 text-slate-400 border border-slate-700'}">${item.rkf}</span>
-                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">${item.tipePengadaan}</span>
-              </div>
-            </td>
-            <td class="p-3">
-              <div class="font-bold text-slate-200">${item.vendor}</div>
-              <div class="text-[10px] text-slate-400 font-mono">PIC: ${item.pic}</div>
-            </td>
-            <td class="p-3 text-right font-mono font-bold text-emerald-400">${formatRupiah(item.cost)}</td>
-            <td class="p-3 font-mono text-[11px]">
-              <div class="text-slate-400">Start: ${item.startKontrak || '-'}</div>
-              <div class="${isUrgent ? 'text-rose-400 font-bold' : 'text-slate-300'}">Due: ${item.endKontrak || '-'}</div>
-            </td>
-            <td class="p-3 text-center">
-              ${getStatusBadgeHtml(item.status)}
-            </td>
-            <td class="p-3 text-center">
-              ${hasUrl ? `
-                <a href="${item.detailUrl}" target="_blank" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-950/60 hover:bg-emerald-900 text-emerald-300 border border-emerald-800 text-[10px] font-bold">
-                  <i data-lucide="file-text" class="w-3 h-3"></i><span>Dokumen</span>
-                </a>
-              ` : `<span class="text-slate-600">-</span>`}
-            </td>
-            <td class="p-3 text-[11px] text-slate-300 max-w-xs line-clamp-2">${item.nextAction || item.deskripsi || '-'}</td>
-            <td class="p-3 text-center">
-              <button onclick="openDetailModal('${item.id}')" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white cursor-pointer"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-
-      document.getElementById('tableCountInfo').innerText = `Menampilkan ${filtered.length} dari ${appData.procurement.length} item`;
-      lucide.createIcons();
-    }
-
-    function renderCharts() {
-      if (vendorChartInstance) vendorChartInstance.destroy();
-      if (statusChartInstance) statusChartInstance.destroy();
-
-      const vendorCosts = {};
-      appData.procurement.forEach(i => {
-        const v = (i.vendor || 'In-House').trim();
-        vendorCosts[v] = (vendorCosts[v] || 0) + (i.cost || 0);
-      });
-      const sortedVendors = Object.keys(vendorCosts).sort((a, b) => vendorCosts[b] - vendorCosts[a]).slice(0, 5);
-
-      const vCtx = document.getElementById('vendorChart')?.getContext('2d');
-      if (vCtx) {
-        vendorChartInstance = new Chart(vCtx, {
-          type: 'bar',
-          data: {
-            labels: sortedVendors.map(v => v.length > 20 ? v.substring(0, 18) + '...' : v),
-            datasets: [{ label: 'Biaya (Rp)', data: sortedVendors.map(v => vendorCosts[v]), backgroundColor: '#059669', borderRadius: 6 }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-              x: { ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } },
-              y: { ticks: { color: '#94a3b8', callback: (val) => (val >= 1e9 ? (val/1e9).toFixed(1)+' M' : (val/1e6).toFixed(0)+' Jt') }, grid: { color: '#334155' } }
-            }
-          }
-        });
-      }
-
-      let ongoingCount = 0, doneCount = 0, otherCount = 0;
-      appData.procurement.forEach(i => {
-        const s = (i.status || '').toLowerCase();
-        if (s.includes('done') || s.includes('selesai')) doneCount++;
-        else if (s.includes('on going') || s.includes('ongoing')) ongoingCount++;
-        else otherCount++;
-      });
-
-      const sCtx = document.getElementById('statusChart')?.getContext('2d');
-      if (sCtx) {
-        statusChartInstance = new Chart(sCtx, {
-          type: 'doughnut',
-          data: {
-            labels: ['On going', 'Selesai / Done', 'Lainnya / Hold'],
-            datasets: [{ data: [ongoingCount, doneCount, otherCount], backgroundColor: ['#2563eb', '#059669', '#d97706'], borderWidth: 0 }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '60%',
-            plugins: { legend: { position: 'right', labels: { color: '#cbd5e1', font: { size: 10 } } } }
-          }
-        });
-      }
-    }
-
-    function renderAnggaranTab() {
-      const items = appData.anggaran;
-      const total2026 = items.reduce((s, i) => s + (i.cost2026 || 0), 0);
-      const total2027 = items.reduce((s, i) => s + (i.forecastingCost2027 || 0), 0);
-      const growth = total2026 > 0 ? ((total2027 - total2026) / total2026) * 100 : 0;
-
-      const opex2026 = items.filter(i => i.anggaran === 'OPEX').reduce((s, i) => s + (i.cost2026 || 0), 0);
-      const capex2026 = items.filter(i => i.anggaran === 'CAPEX').reduce((s, i) => s + (i.cost2026 || 0), 0);
-
-      document.getElementById('kpiAng2026').innerText = formatRupiah(total2026);
-      document.getElementById('kpiAngOpexCapex').innerText = `OPEX: ${formatRupiah(opex2026)} • CAPEX: ${formatRupiah(capex2026)}`;
-      document.getElementById('kpiAng2027').innerText = formatRupiah(total2027);
-      document.getElementById('kpiAngGrowth').innerText = `+${growth.toFixed(1)}%`;
-      document.getElementById('kpiAngDiff').innerText = `Selisih: +${formatRupiah(total2027 - total2026)}`;
-      document.getElementById('kpiAngTotalItems').innerText = `${items.length} Pekerjaan`;
-
-      renderAnggaranTable();
-    }
-
-    function renderAnggaranTable() {
-      const search = (document.getElementById('anggaranSearchInput')?.value || '').toLowerCase();
-      const filtered = appData.anggaran.filter(item => {
-        const matchSearch = !search || item.produk.toLowerCase().includes(search) || item.mataAnggaran.toLowerCase().includes(search);
-        const matchType = activeAnggaranFilter === 'ALL' || item.anggaran === activeAnggaranFilter;
-        return matchSearch && matchType;
-      });
-
-      const tbody = document.getElementById('anggaranTableBody');
-      if (!tbody) return;
-
-      tbody.innerHTML = filtered.map((item, idx) => {
-        const growth = item.cost2026 > 0 ? ((item.forecastingCost2027 - item.cost2026) / item.cost2026) * 100 : 100;
-        return `
-          <tr class="hover:bg-slate-800/40 transition">
-            <td class="p-3 text-center font-mono text-slate-500">${item.no || idx + 1}</td>
-            <td class="p-3 font-bold text-white">${item.produk}</td>
-            <td class="p-3 text-center">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${item.anggaran === 'CAPEX' ? 'bg-blue-950 text-blue-300 border border-blue-800' : 'bg-emerald-950 text-emerald-300 border border-emerald-800'}">${item.anggaran}</span>
-            </td>
-            <td class="p-3 text-center font-mono text-slate-400">${item.mataAnggaran || '-'}</td>
-            <td class="p-3 text-right font-mono font-bold text-emerald-400">${formatRupiah(item.cost2026)}</td>
-            <td class="p-3 text-right font-mono font-bold text-blue-400">${formatRupiah(item.forecastingCost2027)}</td>
-            <td class="p-3 text-center font-mono font-bold text-purple-400">+${growth.toFixed(0)}%</td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function setAnggaranFilter(val) {
-      activeAnggaranFilter = val;
-      ['all', 'opex', 'capex'].forEach(t => {
-        const btn = document.getElementById(`af-${t}`);
-        if (btn) btn.className = 'px-3 py-1 rounded-lg text-slate-400 hover:text-white';
-      });
-      document.getElementById(`af-${val.toLowerCase()}`).className = 'px-3 py-1 rounded-lg bg-emerald-600 text-white shadow-xs';
-      renderAnggaranTable();
-    }
-
-    function renderDatamartTab() {
-      const items = appData.datamart;
-      const doneCount = items.filter(i => (i.keteranganStatus || '').toLowerCase().includes('done') || (i.statusTable || '').toLowerCase().includes('dm_')).length;
-      const rejectedCount = items.filter(i => (i.statusTable || '').toLowerCase().includes('rejected')).length;
-      const inProgressCount = items.length - doneCount - rejectedCount;
-
-      document.getElementById('kpiDmTotal').innerText = `${items.length} Tiket`;
-      document.getElementById('kpiDmDone').innerText = `${doneCount} Table`;
-      document.getElementById('kpiDmProgress').innerText = `${inProgressCount} Tiket`;
-      document.getElementById('kpiDmRejected').innerText = `${rejectedCount} Tiket`;
-
-      renderDatamartTable();
-    }
-
-    function renderDatamartTable() {
-      const search = (document.getElementById('datamartSearchInput')?.value || '').toLowerCase();
-      const filtered = appData.datamart.filter(item => {
-        const matchSearch = !search || item.idTiket.toLowerCase().includes(search) || item.nama.toLowerCase().includes(search) || item.output.toLowerCase().includes(search) || item.statusTable.toLowerCase().includes(search);
-        let matchStatus = true;
-        if (activeDatamartFilter === 'DONE') matchStatus = item.keteranganStatus.toLowerCase().includes('done') || item.statusTable.toLowerCase().includes('dm_');
-        else if (activeDatamartFilter === 'REJECTED') matchStatus = item.statusTable.toLowerCase().includes('rejected');
-        else if (activeDatamartFilter === 'IN_PROGRESS') matchStatus = !item.keteranganStatus.toLowerCase().includes('done') && !item.statusTable.toLowerCase().includes('rejected');
-        return matchSearch && matchStatus;
-      });
-
-      const tbody = document.getElementById('datamartTableBody');
-      if (!tbody) return;
-
-      tbody.innerHTML = filtered.map((item, idx) => {
-        const hasTable = item.statusTable && item.statusTable.includes('pgd-prd');
-        return `
-          <tr class="hover:bg-slate-800/40 transition">
-            <td class="p-3 text-center font-mono text-slate-500">${item.no || idx + 1}</td>
-            <td class="p-3 text-center font-mono"><span class="px-2 py-1 rounded bg-slate-900 border border-slate-800 font-bold text-white">${item.idTiket}</span></td>
-            <td class="p-3">
-              <div class="font-bold text-white">${item.nama}</div>
-              <div class="text-[10px] text-emerald-400 font-medium">Output: ${item.output}</div>
-            </td>
-            <td class="p-3 text-center">
-              ${item.linkTiket && item.linkTiket !== '#' ? `<a href="${item.linkTiket}" target="_blank" class="px-2 py-1 rounded bg-blue-950 text-blue-300 text-[10px] font-bold hover:underline">Jira Ticket</a>` : '-'}
-            </td>
-            <td class="p-3 font-mono text-[11px]">
-              ${hasTable ? `
-                <div class="flex items-center justify-between gap-1 p-1 rounded bg-slate-950 border border-slate-800">
-                  <span class="text-emerald-400 truncate">${item.statusTable}</span>
-                  <button onclick="navigator.clipboard.writeText('${item.statusTable}'); alert('Tersalin: ${item.statusTable}');" class="p-1 text-slate-400 hover:text-white" title="Salin Table ID"><i data-lucide="copy" class="w-3 h-3"></i></button>
-                </div>
-              ` : `<span class="text-rose-400 font-bold">${item.statusTable}</span>`}
-            </td>
-            <td class="p-3 text-slate-300 text-xs">${item.keteranganStatus}</td>
-          </tr>
-        `;
-      }).join('');
-      lucide.createIcons();
-    }
-
-    function setDatamartFilter(val) {
-      activeDatamartFilter = val;
-      ['all', 'done', 'prog', 'rej'].forEach(t => {
-        const btn = document.getElementById(`df-${t}`);
-        if (btn) btn.className = 'px-3 py-1 rounded-lg text-slate-400 hover:text-white';
-      });
-      const activeMap = { ALL: 'df-all', DONE: 'df-done', IN_PROGRESS: 'df-prog', REJECTED: 'df-rej' };
-      document.getElementById(activeMap[val]).className = 'px-3 py-1 rounded-lg bg-emerald-600 text-white shadow-xs';
-      renderDatamartTable();
-    }
-
-    // ==========================================
-    // TAB 7: DATA AUDIT PROMO LOGIC
-    // ==========================================
-    function renderAuditTable() {
-      const search = (document.getElementById('auditSearchInput')?.value || '').toLowerCase().trim();
-      const filtered = appData.auditPromo.filter(item => {
-        if (!search) return true;
-        return (
-          (item.no && item.no.toLowerCase().includes(search)) ||
-          (item.namaPromo && item.namaPromo.toLowerCase().includes(search)) ||
-          (item.deskripsi && item.deskripsi.toLowerCase().includes(search)) ||
-          (item.kodePromo && item.kodePromo.toLowerCase().includes(search))
-        );
-      });
-
-      const tbody = document.getElementById('auditTableBody');
-      const countLabel = document.getElementById('auditTableCountInfo');
-      if (!tbody) return;
-
-      if (countLabel) {
-        countLabel.innerText = `Menampilkan ${filtered.length} dari ${appData.auditPromo.length} item promo`;
-      }
-
-      if (!filtered.length) {
-        tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-xs text-slate-500">Tidak ada data promo yang cocok dengan pencarian "${search}".</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = filtered.map((item, idx) => {
-        const hasUrl = item.linkDokumen && item.linkDokumen !== '#' && item.linkDokumen.startsWith('http');
-        const persentase = item.persentasePenyerapan || 0;
-
-        const codesHtml = (item.kodePromo || '').split(',').map(c => `
-          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-950/70 border border-purple-800/80 text-purple-300 font-mono text-[11px] font-semibold">
-            <i data-lucide="tag" class="w-2.5 h-2.5 text-purple-400"></i>
-            ${c.trim()}
-          </span>
-        `).join('');
-
-        return `
-          <tr class="hover:bg-slate-800/40 transition">
-            <td class="p-3.5 text-center font-mono font-bold text-slate-400">${item.no || idx + 1}</td>
-            <td class="p-3.5">
-              <div class="font-bold text-slate-100 text-[13px] leading-snug">${item.namaPromo}</div>
-            </td>
-            <td class="p-3.5">
-              <p class="text-slate-300 text-xs leading-relaxed line-clamp-3">${item.deskripsi}</p>
-            </td>
-            <td class="p-3.5">
-              <div class="flex flex-wrap gap-1">${codesHtml}</div>
-            </td>
-            <td class="p-3.5 text-center">
-              ${hasUrl ? `
-                <a href="${item.linkDokumen}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-teal-950/60 hover:bg-teal-900/80 text-teal-300 border border-teal-800 text-[11px] font-bold transition shadow-2xs" title="${item.linkDokumen}">
-                  <i data-lucide="folder-open" class="w-3.5 h-3.5 text-teal-400"></i>
-                  <span>Buka Drive</span>
-                  <i data-lucide="external-link" class="w-2.5 h-2.5 opacity-70"></i>
-                </a>
-              ` : `<span class="text-slate-600 font-mono text-xs">-</span>`}
-            </td>
-            <td class="p-3.5 text-right font-mono">
-              <div class="font-bold text-white text-[13px]">${formatRupiah(item.budgeting)}</div>
-            </td>
-            <td class="p-3.5 text-right font-mono">
-              <div class="font-bold text-emerald-400 text-[13px]">${formatRupiah(item.penyerapanBudgeting)}</div>
-              ${item.budgeting > 0 ? `
-                <div class="flex items-center justify-end gap-1.5 mt-1">
-                  <div class="w-16 bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                    <div class="h-full rounded-full ${persentase >= 100 ? 'bg-amber-400' : 'bg-emerald-400'}" style="width: ${Math.min(persentase, 100)}%"></div>
-                  </div>
-                  <span class="text-[10px] text-slate-400 font-semibold">${persentase}%</span>
-                </div>
-              ` : ''}
-            </td>
-            <td class="p-3.5 text-center">
-              <button onclick="openAuditModal('${item.no}')" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition cursor-pointer" title="Lihat Detail Lengkap">
-                <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-
-      lucide.createIcons();
-    }
-
-    function openAuditModal(no) {
-      const item = appData.auditPromo.find(i => String(i.no) === String(no));
-      if (!item) return;
-
-      document.getElementById('auditModalNoPill').innerText = `No. ${item.no}`;
-      document.getElementById('auditModalName').innerText = item.namaPromo;
-      document.getElementById('auditModalDesc').innerText = item.deskripsi || '-';
-
-      const codesContainer = document.getElementById('auditModalCodes');
-      codesContainer.innerHTML = (item.kodePromo || '').split(',').map(c => `
-        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-purple-950 border border-purple-800 text-purple-300 font-mono text-xs font-bold">
-          <i data-lucide="tag" class="w-3 h-3 text-purple-400"></i>
-          ${c.trim()}
-        </span>
-      `).join('');
-
-      document.getElementById('auditModalBudget').innerText = formatRupiah(item.budgeting);
-      document.getElementById('auditModalPenyerapan').innerText = formatRupiah(item.penyerapanBudgeting);
-
-      const persentase = item.persentasePenyerapan || 0;
-      document.getElementById('auditModalPercent').innerText = `${persentase}%`;
-      document.getElementById('auditModalProgressBar').style.width = `${Math.min(persentase, 100)}%`;
-      document.getElementById('auditModalTerpakaiLabel').innerText = `Terpakai: ${formatRupiah(item.penyerapanBudgeting)}`;
-      document.getElementById('auditModalSisaLabel').innerText = `Sisa: ${formatRupiah(item.sisaBudget || 0)}`;
-
-      currentAuditModalLink = item.linkDokumen || '#';
-      const docPreview = document.getElementById('auditModalDocPreview');
-      const openDocBtn = document.getElementById('auditModalOpenDocBtn');
-      const actionGroup = document.getElementById('auditModalDocActionGroup');
-
-      if (currentAuditModalLink && currentAuditModalLink !== '#' && currentAuditModalLink.startsWith('http')) {
-        docPreview.innerText = currentAuditModalLink;
-        openDocBtn.href = currentAuditModalLink;
-        actionGroup.classList.remove('hidden');
-      } else {
-        docPreview.innerText = 'Belum ada link dokumen Google Drive.';
-        openDocBtn.href = '#';
-        actionGroup.classList.add('hidden');
-      }
-
-      document.getElementById('auditDetailModal').classList.remove('hidden');
-      lucide.createIcons();
-    }
-
-    function closeAuditModal() {
-      document.getElementById('auditDetailModal').classList.add('hidden');
-    }
-
-    function copyAuditModalLink() {
-      if (currentAuditModalLink && currentAuditModalLink !== '#' && currentAuditModalLink.startsWith('http')) {
-        navigator.clipboard.writeText(currentAuditModalLink);
-        const textSpan = document.getElementById('auditModalCopyText');
-        textSpan.innerText = 'Tersalin!';
-        setTimeout(() => { textSpan.innerText = 'Salin URL'; }, 2000);
-      }
-    }
-
-    function exportAuditPromoCSV() {
-      const items = appData.auditPromo;
-      if (!items || items.length === 0) return;
-      const headers = ['No', 'Nama Promo', 'Deskripsi', 'Kode Promo', 'Link Dokumen', 'Budgeting', 'Penyerapan Budgeting'];
-      const rows = items.map(i => [
-        i.no,
-        `"${(i.namaPromo || '').replace(/"/g, '""')}"`,
-        `"${(i.deskripsi || '').replace(/"/g, '""')}"`,
-        `"${(i.kodePromo || '').replace(/"/g, '""')}"`,
-        `"${(i.linkDokumen || '').replace(/"/g, '""')}"`,
-        i.budgeting || 0,
-        i.penyerapanBudgeting || 0
-      ]);
-      const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `Data_Audit_Promo_${new Date().toISOString().slice(0, 10)}.csv`;
-      a.click();
-    }
-
-    // Modal Project Detail
-    function openDetailModal(id) {
-      const item = appData.procurement.find(i => String(i.id) === String(id));
-      if (!item) return;
-      
-      const isRkf = item.rkf === 'RKF';
-      const rkfPill = document.getElementById('modalRkfPill');
-      rkfPill.innerText = item.rkf;
-      rkfPill.className = `px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border ${isRkf ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-slate-800 text-slate-300 border border-slate-700'}`;
-
-      document.getElementById('modalTipePill').innerText = `${item.tipePengadaan} • ${item.tipeProject}`;
-      
-      const statusBadge = document.getElementById('modalStatusBadge');
-      if (statusBadge) {
-        statusBadge.outerHTML = `<span id="modalStatusBadge">${getStatusBadgeHtml(item.status)}</span>`;
-      }
-
-      document.getElementById('modalTaskName').innerText = item.namaTask;
-      document.getElementById('modalProkerName').innerText = `Proker: ${item.namaProker}`;
-      document.getElementById('modalVendor').innerText = item.vendor;
-      document.getElementById('modalPic').innerText = item.pic;
-      document.getElementById('modalCost').innerText = formatRupiah(item.cost);
-      document.getElementById('modalDueDate').innerText = item.endKontrak || '-';
-      document.getElementById('modalDesc').innerText = item.deskripsi || '-';
-      document.getElementById('modalNextAction').innerText = item.nextAction || '-';
-
-      currentModalLink = item.detailUrl || '#';
-      document.getElementById('modalDocPreview').innerText = currentModalLink !== '#' ? currentModalLink : 'Belum ada link dokumen';
-      document.getElementById('modalOpenDocBtn').href = currentModalLink !== '#' ? currentModalLink : '#';
-      document.getElementById('projectDetailModal').classList.remove('hidden');
-      lucide.createIcons();
-    }
-    function closeDetailModal() { document.getElementById('projectDetailModal').classList.add('hidden'); }
-    function copyModalLink() {
-      if (currentModalLink && currentModalLink !== '#') {
-        navigator.clipboard.writeText(currentModalLink);
-        document.getElementById('modalCopyText').innerText = 'Tersalin!';
-        setTimeout(() => { document.getElementById('modalCopyText').innerText = 'Salin URL'; }, 2000);
-      }
-    }
-
-    function openAIModal() {
-      document.getElementById('aiAssistantModal').classList.remove('hidden');
-      document.getElementById('aiSummaryText').innerText = `Dashboard memantau ${appData.procurement.length} item pengadaan, total komitmen anggaran ${document.getElementById('kpiTotalCost').innerText}, ${appData.datamart.length} tiket request Datamart, dan ${appData.auditPromo.length} item audit promo.`;
-      
-      const urgentItems = appData.procurement.filter(i => i.paymentPriority === 'Urgent');
-      const risksList = document.getElementById('aiRisksList');
-      if (urgentItems.length > 0) {
-        risksList.innerHTML = urgentItems.map(i => `<li><b>${i.vendor}:</b> ${i.namaTask} jatuh tempo pada ${i.endKontrak} (Segera tindak lanjuti SPK/Adendum).</li>`).join('');
-      } else {
-        risksList.innerHTML = `<li>Semua jadwal kontrak berjalan sesuai timeline.</li>`;
-      }
-      lucide.createIcons();
-    }
-    function closeAIModal() { document.getElementById('aiAssistantModal').classList.add('hidden'); }
-
-    function exportCurrentViewCSV() {
-      if (currentTab === 'audit') {
-        exportAuditPromoCSV();
-        return;
-      }
-
-      let csv = '';
-      if (currentTab === 'anggaran') {
-        const headers = ['No,Produk,Anggaran,Mata Anggaran,Cost 2026,Forecasting 2027'];
-        const rows = appData.anggaran.map(i => `${i.no},"${i.produk}",${i.anggaran},${i.mataAnggaran},${i.cost2026},${i.forecastingCost2027}`);
-        csv = [headers, ...rows].join('\n');
-      } else if (currentTab === 'datamart') {
-        const headers = ['No,ID Tiket,Nama Permintaan,Output,Link Tiket,Status Table,Keterangan'];
-        const rows = appData.datamart.map(i => `${i.no},${i.idTiket},"${i.nama}","${i.output}",${i.linkTiket},"${i.statusTable}","${i.keteranganStatus}"`);
-        csv = [headers, ...rows].join('\n');
-      } else {
-        const headers = ['ID,Nama Proker,Nama Task,RKF,Vendor,PIC,Cost,Start Kontrak,End Kontrak,Status'];
-        const rows = appData.procurement.map(i => `${i.id},"${i.namaProker}","${i.namaTask}",${i.rkf},"${i.vendor}",${i.pic},${i.cost},${i.startKontrak},${i.endKontrak},${i.status}`);
-        csv = [headers, ...rows].join('\n');
-      }
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `Export_${currentTab}_${new Date().toISOString().slice(0,10)}.csv`;
-      a.click();
-    }
-
-    function filterByPriority(p) { switchTab('payments'); document.getElementById('paymentPriorityDropdown').value = p; renderPaymentCards(); }
-    function filterByStatus(s) { switchTab('table'); document.getElementById('tableStatusFilter').value = s; renderMainTable(); }
-    function filterByRkfOnly() { switchTab('table'); document.getElementById('tableRkfFilter').value = 'RKF'; renderMainTable(); }
-
-    window.addEventListener('load', () => {
-      loadAllData();
+    // Close Modal on Escape key
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeDetailModal();
+    });
+
+    // Inisialisasi saat load
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchSheetData();
       lucide.createIcons();
     });
   </script>
