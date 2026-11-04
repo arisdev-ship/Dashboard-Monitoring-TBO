@@ -22,7 +22,7 @@
     .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 4px; }
   </style>
-</head>
+<script src="/_aistudio-iframe.js?v=1f94f900"></script></head>
 <body class="bg-slate-950 text-slate-100 min-h-screen pb-12 selection:bg-emerald-500 selection:text-white">
 
   <!-- TOP HEADER BAR -->
@@ -65,7 +65,7 @@
   <!-- MAIN CONTAINER -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 space-y-4">
 
-    <!-- Navigation Tabs -->
+    <!-- Navigation Tabs (Lengkap 7 Menu) -->
     <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
       <div class="flex flex-wrap items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
         <button onclick="switchTab('overview')" id="tab-overview" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition bg-emerald-600 text-white shadow-xs">
@@ -175,6 +175,7 @@
     <!-- TAB 1: OVERVIEW -->
     <div id="view-overview" class="space-y-4">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Vendor Cost Chart -->
         <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
           <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
             <div>
@@ -186,6 +187,7 @@
           <div class="h-60 relative"><canvas id="vendorChart"></canvas></div>
         </div>
 
+        <!-- Status Breakdown Chart -->
         <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
           <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
             <div>
@@ -198,11 +200,12 @@
         </div>
       </div>
 
+      <!-- Quick Deadline Section -->
       <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
           <div>
             <h3 class="text-xs font-bold text-white uppercase tracking-tight">Critical Payment Deadlines & Schedule Kontrak</h3>
-            <p class="text-[11px] text-slate-400">Pantau jatuh tempo dan link dokumen pendukung</p>
+            <p class="text-[11px] text-slate-400">Pantau jatuh tempo, kuartal, administrasi, dan link dokumen pendukung</p>
           </div>
           <button onclick="switchTab('payments')" class="text-xs font-bold text-emerald-400 hover:underline inline-flex items-center gap-1 cursor-pointer">
             <span>Lihat Semua Jadwal</span>
@@ -216,7 +219,7 @@
             type="text" 
             id="overviewSearchInput" 
             oninput="renderOverviewCards()" 
-            placeholder="Cari jadwal pembayaran berdasarkan vendor, task, proker, PIC, status, output..." 
+            placeholder="Cari jadwal pembayaran berdasarkan vendor, task, proker, PIC, status, output, quartal, adm..." 
             class="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-emerald-500 transition"
           >
         </div>
@@ -231,10 +234,18 @@
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-3 border-b border-slate-800">
           <div>
             <h2 class="text-sm font-bold text-white uppercase tracking-tight">Schedule & Prioritas Jatuh Tempo Pembayaran</h2>
-            <p class="text-[11px] text-slate-400">Monitoring verifikasi BAST, SPK, status pengerjaan, dan link dokumen penagihan</p>
+            <p class="text-[11px] text-slate-400">Monitoring verifikasi BAST, SPK, status pengerjaan, kuartal target, dan link dokumen penagihan</p>
           </div>
           
           <div class="flex flex-wrap items-center gap-2">
+            <!-- Filter Quartal di Tab Payment -->
+            <div class="flex items-center gap-1.5 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 shadow-2xs">
+              <span class="text-[10px] font-bold text-purple-400 uppercase">Quartal:</span>
+              <select id="paymentQuartalDropdown" onchange="renderPaymentCards()" class="bg-transparent text-xs font-semibold text-purple-300 focus:outline-hidden cursor-pointer">
+                <option value="ALL" class="bg-slate-900 text-white">Semua Quartal</option>
+              </select>
+            </div>
+
             <div class="flex items-center gap-1.5 bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 shadow-2xs">
               <span class="text-[10px] font-bold text-slate-400 uppercase">Status:</span>
               <select id="paymentStatusDropdown" onchange="renderPaymentCards()" class="bg-transparent text-xs font-semibold text-white focus:outline-hidden cursor-pointer">
@@ -269,7 +280,7 @@
             type="text" 
             id="paymentsSearchInput" 
             oninput="renderPaymentCards()" 
-            placeholder="Cari nama proker, task, vendor, PIC, RKF, atau status..." 
+            placeholder="Cari nama proker, task, vendor, PIC, RKF, status, quartal, expected adm..." 
             class="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-emerald-500 transition"
           >
         </div>
@@ -297,16 +308,24 @@
       <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-col md:flex-row gap-2">
         <div class="relative flex-1">
           <i data-lucide="search" class="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400"></i>
-          <input type="text" id="tableSearchInput" oninput="renderMainTable()" placeholder="Cari nama proker, task, vendor, PIC, output..." class="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-emerald-500">
+          <input type="text" id="tableSearchInput" oninput="renderMainTable()" placeholder="Cari nama proker, task, vendor, PIC, output, quartal, adm..." class="w-full pl-9 pr-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-hidden focus:border-emerald-500">
         </div>
+        
         <!-- FILTER TAHUN (KOLOM D) -->
         <select id="tableYearFilter" onchange="renderMainTable()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-400 font-bold focus:outline-hidden">
           <option value="ALL">Semua Tahun</option>
         </select>
+
+        <!-- FILTER QUARTAL EXPECTED (KOLOM U) -->
+        <select id="tableQuartalFilter" onchange="renderMainTable()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-purple-400 font-bold focus:outline-hidden">
+          <option value="ALL">Semua Quartal</option>
+        </select>
+
         <!-- FILTER STATUS -->
         <select id="tableStatusFilter" onchange="renderMainTable()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-hidden">
           <option value="ALL">Semua Status</option>
         </select>
+
         <!-- FILTER RKF -->
         <select id="tableRkfFilter" onchange="renderMainTable()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-hidden">
           <option value="ALL">Semua Tipe RKF</option>
@@ -322,6 +341,8 @@
               <tr>
                 <th class="p-3 w-10 text-center">ID</th>
                 <th class="p-3 text-center">Tahun</th>
+                <th class="p-3 text-center">Quartal</th>
+                <th class="p-3">Expected Adm</th>
                 <th class="p-3">Project / Task</th>
                 <th class="p-3">Output Project</th>
                 <th class="p-3">Vendor & PIC</th>
@@ -512,28 +533,38 @@
     <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
       <div class="flex items-start justify-between p-4 border-b border-slate-800 bg-slate-950/60">
         <div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
             <span id="modalRkfPill" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border bg-emerald-950 text-emerald-300 border-emerald-800">RKF</span>
             <span id="modalTipePill" class="text-[10px] font-mono font-bold text-slate-400 uppercase">Eksternal • Vendor</span>
             <span id="modalStatusBadge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border bg-blue-950 text-blue-300 border-blue-800">On going</span>
             <span id="modalTahunBadge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border bg-amber-950 text-amber-300 border-amber-800">2026</span>
+            <span id="modalQuartalBadge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border bg-purple-950 text-purple-300 border-purple-800">Q1</span>
           </div>
-          <h3 id="modalTaskName" class="text-base font-bold text-white mt-1">Nama Proyek</h3>
+          <h3 id="modalTaskName" class="text-base font-bold text-white mt-1.5">Nama Proyek</h3>
           <p id="modalProkerName" class="text-xs text-slate-400">Proker: -</p>
         </div>
         <button onclick="closeDetailModal()" class="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
       </div>
+      
       <div class="p-4 overflow-y-auto space-y-3 custom-scrollbar text-xs">
         
-        <!-- Output Project (Kolom X) & Tahun (Kolom D) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <div class="p-2.5 bg-indigo-950/30 border border-indigo-800/50 rounded-xl">
-            <span class="text-[10px] text-indigo-400 font-bold uppercase">Output Project (Kolom X)</span>
-            <div id="modalOutputProject" class="font-bold text-indigo-200 mt-0.5">-</div>
+        <!-- Baris 4 Kotak Info: Output, Tahun, Quartal, Expected Adm -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div class="p-2.5 bg-purple-950/30 border border-purple-800/50 rounded-xl">
+            <span class="text-[9px] text-purple-400 font-bold uppercase tracking-wider">Quartal Expected (Kolom U)</span>
+            <div id="modalQuartal" class="font-bold text-purple-200 mt-0.5 text-sm">-</div>
+          </div>
+          <div class="p-2.5 bg-teal-950/30 border border-teal-800/50 rounded-xl">
+            <span class="text-[9px] text-teal-400 font-bold uppercase tracking-wider">Expected Adm (Kolom V)</span>
+            <div id="modalExpectedAdm" class="font-bold text-teal-200 mt-0.5 text-xs truncate">-</div>
           </div>
           <div class="p-2.5 bg-amber-950/30 border border-amber-800/50 rounded-xl">
-            <span class="text-[10px] text-amber-400 font-bold uppercase">Tahun Pengadaan (Kolom D)</span>
-            <div id="modalTahun" class="font-bold text-amber-200 mt-0.5">-</div>
+            <span class="text-[9px] text-amber-400 font-bold uppercase tracking-wider">Tahun (Kolom D)</span>
+            <div id="modalTahun" class="font-bold text-amber-200 mt-0.5 text-sm">-</div>
+          </div>
+          <div class="p-2.5 bg-indigo-950/30 border border-indigo-800/50 rounded-xl">
+            <span class="text-[9px] text-indigo-400 font-bold uppercase tracking-wider">Output Project (Kolom X)</span>
+            <div id="modalOutputProject" class="font-bold text-indigo-200 mt-0.5 text-xs truncate">-</div>
           </div>
         </div>
 
@@ -805,7 +836,7 @@
         const colId = findCol(['id']) !== -1 ? findCol(['id']) : 0;
         const colProker = findCol(['nama project', 'proker']) !== -1 ? findCol(['nama project', 'proker']) : 1;
         const colTask = findCol(['nama task', 'task']) !== -1 ? findCol(['nama task', 'task']) : 2;
-        // Kolom D (Tahun)
+        // Kolom D (Tahun - Index 3)
         const colTahun = findCol(['tahun', 'year']) !== -1 ? findCol(['tahun', 'year']) : 3;
         const colRkf = findCol(['rkf', 'status rkf', 'rkf / non-rkf', 'rkf/non', 'kategori rkf']);
         const colTipePengadaan = findCol(['tipe pengadaan']) !== -1 ? findCol(['tipe pengadaan']) : 4;
@@ -818,23 +849,31 @@
         const colTotalPemakaian = findCol(['total pemakaian', 'pemakaian']) !== -1 ? findCol(['total pemakaian', 'pemakaian']) : 11;
         const colUtilisasi = findCol(['utlisisasi', 'utilisasi']) !== -1 ? findCol(['utlisisasi', 'utilisasi']) : 12;
         const colStatusBilling = findCol(['status billing']);
-        const colStartKontrak = findCol(['start kontrak', 'mulai']) !== -1 ? findCol(['start kontrak', 'mulai']) : 15;
+        const colStartKontrak = findCol(['start kontrak', 'mulai']) !== -1 ? findCol(['start kontrak', 'mulai']) : 16;
         const colEndKontrakR = headers.findIndex(h => h === 'end kontrak');
-        const colEndKontrakFallback = findCol(['end kontrak', 'selesai', 'jatuh tempo']) !== -1 ? findCol(['end kontrak', 'selesai', 'jatuh tempo']) : 16;
+        const colEndKontrakFallback = findCol(['end kontrak', 'selesai', 'jatuh tempo']) !== -1 ? findCol(['end kontrak', 'selesai', 'jatuh tempo']) : 17;
         const colStatus = headers.findIndex((h, i) => i !== colStatusBilling && (h === 'status' || h.startsWith('status')));
-        const finalStatusIdx = colStatus !== -1 ? colStatus : 18;
-        const colDeskripsi = findCol(['deskripsi', 'keterangan']) !== -1 ? findCol(['deskripsi', 'keterangan']) : 19;
-        const colNextAction = findCol(['next action', 'tindakan']) !== -1 ? findCol(['next action', 'tindakan']) : 20;
-        const colDetailUrl = findCol(['detail', 'link dokumen', 'dokumen', 'link', 'url']) !== -1 ? findCol(['detail', 'link dokumen', 'dokumen', 'link', 'url']) : 21;
-        // Kolom X (Output Project)
-        const colOutputProject = findCol(['output project', 'output']) !== -1 ? findCol(['output project', 'output']) : 23;
+        const finalStatusIdx = colStatus !== -1 ? colStatus : 19;
+
+        // Kolom U: Quartal Expected (Index 20)
+        const colQuartal = findCol(['quartal expected', 'quartal', 'kuartal']) !== -1 ? findCol(['quartal expected', 'quartal', 'kuartal']) : 20;
+        // Kolom V: Expected Adm (Index 21)
+        const colExpectedAdm = findCol(['expected adm', 'adm', 'administrasi']) !== -1 ? findCol(['expected adm', 'adm', 'administrasi']) : 21;
+
+        const colDeskripsi = findCol(['deskripsi', 'keterangan']) !== -1 ? findCol(['deskripsi', 'keterangan']) : 22;
+        const colNextAction = findCol(['next action', 'tindakan']) !== -1 ? findCol(['next action', 'tindakan']) : 23;
+        const colDetailUrl = findCol(['detail', 'link dokumen', 'dokumen', 'link', 'url']) !== -1 ? findCol(['detail', 'link dokumen', 'dokumen', 'link', 'url']) : 24;
+        // Kolom X: Output Project (Index 25)
+        const colOutputProject = findCol(['output project', 'output']) !== -1 ? findCol(['output project', 'output']) : 25;
 
         appData.procurement = procRows.slice(1).map((r, idx) => {
           const rawId = cleanText(r[colId]);
           const proker = cleanText(r[colProker]);
           const task = cleanText(r[colTask]);
           const tahun = cleanText(r[colTahun]) || cleanText(r[3]) || '2026';
-          const outputProject = cleanText(r[colOutputProject]) || cleanText(r[23]) || '-';
+          const quartalExpected = cleanText(r[colQuartal]) || cleanText(r[20]) || '-';
+          const expectedAdm = cleanText(r[colExpectedAdm]) || cleanText(r[21]) || '-';
+          const outputProject = cleanText(r[colOutputProject]) || cleanText(r[25]) || cleanText(r[23]) || '-';
           const vendor = cleanText(r[colVendor]);
           const cost = parseNum(r[colCost]);
           const kuota = cleanText(r[colKuota]) ? parseNum(r[colKuota]) : null;
@@ -862,6 +901,8 @@
           return {
             id: rawId || String(idx + 1),
             tahun,
+            quartalExpected,
+            expectedAdm,
             outputProject,
             namaProker: proker || task || 'Proker / Project',
             namaTask: task || proker || 'Task / Activity',
@@ -1046,6 +1087,25 @@
           years.map(y => `<option value="${y}">Tahun ${y}</option>`).join('');
         yearDropdown.value = curYear || 'ALL';
       }
+
+      // Populate Quartal Dropdown (Kolom U)
+      const quartals = Array.from(new Set(appData.procurement.map(i => (i.quartalExpected || '').trim()).filter(q => q && q !== '-'))).sort();
+      
+      const tableQuartalSelect = document.getElementById('tableQuartalFilter');
+      if (tableQuartalSelect) {
+        const curQ = tableQuartalSelect.value;
+        tableQuartalSelect.innerHTML = `<option value="ALL">Semua Quartal</option>` +
+          quartals.map(q => `<option value="${q}">Quartal ${q}</option>`).join('');
+        tableQuartalSelect.value = curQ || 'ALL';
+      }
+
+      const paymentQuartalSelect = document.getElementById('paymentQuartalDropdown');
+      if (paymentQuartalSelect) {
+        const curQ = paymentQuartalSelect.value;
+        paymentQuartalSelect.innerHTML = `<option value="ALL" class="bg-slate-900 text-white">Semua Quartal</option>` +
+          quartals.map(q => `<option value="${q}" class="bg-slate-900 text-purple-300 font-bold">${q}</option>`).join('');
+        paymentQuartalSelect.value = curQ || 'ALL';
+      }
     }
 
     function onDataLoaded() {
@@ -1144,16 +1204,32 @@
             <div class="flex items-center justify-between gap-1 mb-1.5">
               <span class="text-xs font-bold text-white truncate">${item.vendor || 'In-House'}</span>
               <div class="flex items-center gap-1">
+                ${item.quartalExpected && item.quartalExpected !== '-' ? `
+                  <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-purple-950 text-purple-300 border border-purple-800">${item.quartalExpected}</span>
+                ` : ''}
                 <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase ${isRkf ? 'bg-emerald-950 text-emerald-300 border border-emerald-800' : 'bg-slate-800 text-slate-400 border border-slate-700'}">${item.rkf || 'Non-RKF'}</span>
                 ${getStatusBadgeHtml(item.status)}
               </div>
             </div>
             <h4 class="text-xs font-bold text-slate-200 line-clamp-1">${item.namaTask}</h4>
             <p class="text-[10px] text-slate-400 line-clamp-1 mb-1">${item.namaProker}</p>
+            
+            <div class="grid grid-cols-2 gap-1 my-1.5 text-[10px] font-mono bg-slate-950/60 p-1.5 rounded-lg border border-slate-800/80">
+              <div class="text-purple-300 flex items-center gap-1 truncate">
+                <i data-lucide="target" class="w-3 h-3 text-purple-400 shrink-0"></i>
+                <span class="truncate">Q: <b>${item.quartalExpected || '-'}</b></span>
+              </div>
+              <div class="text-teal-300 flex items-center gap-1 truncate">
+                <i data-lucide="calendar-clock" class="w-3 h-3 text-teal-400 shrink-0"></i>
+                <span class="truncate">Adm: <b>${item.expectedAdm || '-'}</b></span>
+              </div>
+            </div>
+
             <div class="text-[10px] text-indigo-300 font-medium mb-2 flex items-center gap-1">
-              <i data-lucide="layers" class="w-3 h-3 text-indigo-400"></i>
+              <i data-lucide="layers" class="w-3 h-3 text-indigo-400 shrink-0"></i>
               <span class="truncate">Output: ${item.outputProject || '-'}</span>
             </div>
+            
             <div class="space-y-1 py-2 border-y border-slate-800 font-mono text-[11px]">
               <div class="flex justify-between"><span class="text-slate-500">Tahun / Nilai:</span><span class="font-bold text-emerald-400">${item.tahun ? `[${item.tahun}] ` : ''}${formatRupiah(item.cost)}</span></div>
               <div class="flex justify-between"><span class="text-slate-500">Start:</span><span class="text-slate-300">${item.startKontrak || '-'}</span></div>
@@ -1184,6 +1260,8 @@
           (item.vendor && item.vendor.toLowerCase().includes(search)) ||
           (item.pic && item.pic.toLowerCase().includes(search)) ||
           (item.outputProject && item.outputProject.toLowerCase().includes(search)) ||
+          (item.quartalExpected && item.quartalExpected.toLowerCase().includes(search)) ||
+          (item.expectedAdm && item.expectedAdm.toLowerCase().includes(search)) ||
           (item.rkf && item.rkf.toLowerCase().includes(search)) ||
           (item.status && item.status.toLowerCase().includes(search));
       });
@@ -1206,6 +1284,7 @@
       const statusVal = document.getElementById('paymentStatusDropdown')?.value || 'ALL';
       const rkfVal = document.getElementById('paymentRkfDropdown')?.value || 'ALL';
       const priorityVal = document.getElementById('paymentPriorityDropdown')?.value || 'ALL';
+      const quartalVal = document.getElementById('paymentQuartalDropdown')?.value || 'ALL';
 
       const filtered = appData.procurement.filter(item => {
         const matchSearch = !search ||
@@ -1214,14 +1293,17 @@
           (item.vendor && item.vendor.toLowerCase().includes(search)) ||
           (item.pic && item.pic.toLowerCase().includes(search)) ||
           (item.outputProject && item.outputProject.toLowerCase().includes(search)) ||
+          (item.quartalExpected && item.quartalExpected.toLowerCase().includes(search)) ||
+          (item.expectedAdm && item.expectedAdm.toLowerCase().includes(search)) ||
           (item.rkf && item.rkf.toLowerCase().includes(search)) ||
           (item.status && item.status.toLowerCase().includes(search));
 
         const matchStatus = statusVal === 'ALL' || (item.status && item.status.toLowerCase() === statusVal.toLowerCase());
         const matchRkf = rkfVal === 'ALL' || item.rkf === rkfVal;
         const matchPri = priorityVal === 'ALL' || item.paymentPriority === priorityVal;
+        const matchQ = quartalVal === 'ALL' || item.quartalExpected === quartalVal;
 
-        return matchSearch && matchStatus && matchRkf && matchPri;
+        return matchSearch && matchStatus && matchRkf && matchPri && matchQ;
       });
 
       const container = document.getElementById('paymentCardsGrid');
@@ -1268,6 +1350,7 @@
     function renderMainTable() {
       const search = (document.getElementById('tableSearchInput')?.value || '').toLowerCase();
       const yearFilter = document.getElementById('tableYearFilter')?.value || 'ALL';
+      const quartalFilter = document.getElementById('tableQuartalFilter')?.value || 'ALL';
       const statusFilter = document.getElementById('tableStatusFilter')?.value || 'ALL';
       const rkfFilter = document.getElementById('tableRkfFilter')?.value || 'ALL';
 
@@ -1277,19 +1360,22 @@
           (item.namaTask && item.namaTask.toLowerCase().includes(search)) ||
           (item.vendor && item.vendor.toLowerCase().includes(search)) ||
           (item.outputProject && item.outputProject.toLowerCase().includes(search)) ||
+          (item.quartalExpected && item.quartalExpected.toLowerCase().includes(search)) ||
+          (item.expectedAdm && item.expectedAdm.toLowerCase().includes(search)) ||
           (item.pic && item.pic.toLowerCase().includes(search));
 
         const matchYear = yearFilter === 'ALL' || String(item.tahun) === String(yearFilter);
+        const matchQuartal = quartalFilter === 'ALL' || item.quartalExpected === quartalFilter;
         const matchStatus = statusFilter === 'ALL' || (item.status && item.status.toLowerCase().includes(statusFilter.toLowerCase()));
         const matchRkf = rkfFilter === 'ALL' || item.rkf === rkfFilter;
-        return matchSearch && matchYear && matchStatus && matchRkf;
+        return matchSearch && matchYear && matchQuartal && matchStatus && matchRkf;
       });
 
       const tbody = document.getElementById('mainTableBody');
       if (!tbody) return;
 
       if (!filtered.length) {
-        tbody.innerHTML = `<tr><td colspan="11" class="p-8 text-center text-xs text-slate-500">Tidak ada data yang cocok dengan kriteria filter.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="13" class="p-8 text-center text-xs text-slate-500">Tidak ada data yang cocok dengan kriteria filter.</td></tr>`;
         document.getElementById('tableCountInfo').innerText = `Menampilkan 0 dari ${appData.procurement.length} item`;
         return;
       }
@@ -1303,6 +1389,12 @@
           <tr onclick="openDetailModal('${item.id}')" class="hover:bg-slate-800/60 transition cursor-pointer group">
             <td class="p-3 text-center font-mono font-bold text-slate-500 group-hover:text-slate-300">${item.id}</td>
             <td class="p-3 text-center font-mono font-bold text-amber-400">${item.tahun || '-'}</td>
+            <td class="p-3 text-center font-mono">
+              ${item.quartalExpected && item.quartalExpected !== '-' ? `
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-950/80 text-purple-300 border border-purple-800">${item.quartalExpected}</span>
+              ` : `<span class="text-slate-600">-</span>`}
+            </td>
+            <td class="p-3 font-mono text-xs text-teal-300 font-semibold whitespace-nowrap">${item.expectedAdm || '-'}</td>
             <td class="p-3 max-w-xs">
               <div class="font-bold text-slate-100 line-clamp-1 group-hover:text-emerald-300 transition">${item.namaTask}</div>
               <div class="text-[10px] text-slate-400 line-clamp-1">${item.namaProker}</div>
@@ -1704,11 +1796,24 @@
         statusBadge.outerHTML = `<span id="modalStatusBadge">${getStatusBadgeHtml(item.status)}</span>`;
       }
 
-      // Tahun & Output Project
+      // Tahun, Quartal, Expected Adm, & Output Project
       const tahunBadge = document.getElementById('modalTahunBadge');
       if (tahunBadge) {
         tahunBadge.innerText = item.tahun || '2026';
       }
+      
+      const quartalBadge = document.getElementById('modalQuartalBadge');
+      if (quartalBadge) {
+        if (item.quartalExpected && item.quartalExpected !== '-') {
+          quartalBadge.classList.remove('hidden');
+          quartalBadge.innerText = item.quartalExpected;
+        } else {
+          quartalBadge.classList.add('hidden');
+        }
+      }
+
+      document.getElementById('modalQuartal').innerText = item.quartalExpected || '-';
+      document.getElementById('modalExpectedAdm').innerText = item.expectedAdm || '-';
       document.getElementById('modalOutputProject').innerText = item.outputProject || '-';
       document.getElementById('modalTahun').innerText = item.tahun || '-';
 
@@ -1769,8 +1874,8 @@
         const rows = appData.datamart.map(i => `${i.no},${i.idTiket},"${i.nama}","${i.output}",${i.linkTiket},"${i.statusTable}","${i.keteranganStatus}"`);
         csv = [headers, ...rows].join('\n');
       } else {
-        const headers = ['ID,Tahun,Nama Proker,Nama Task,Output Project,RKF,Vendor,PIC,Cost,Start Kontrak,End Kontrak,Status'];
-        const rows = appData.procurement.map(i => `${i.id},${i.tahun},"${i.namaProker}","${i.namaTask}","${i.outputProject}",${i.rkf},"${i.vendor}",${i.pic},${i.cost},${i.startKontrak},${i.endKontrak},${i.status}`);
+        const headers = ['ID,Tahun,Quartal Expected,Expected Adm,Nama Proker,Nama Task,Output Project,RKF,Vendor,PIC,Cost,Start Kontrak,End Kontrak,Status'];
+        const rows = appData.procurement.map(i => `${i.id},${i.tahun},"${i.quartalExpected}","${i.expectedAdm}","${i.namaProker}","${i.namaTask}","${i.outputProject}",${i.rkf},"${i.vendor}",${i.pic},${i.cost},${i.startKontrak},${i.endKontrak},${i.status}`);
         csv = [headers, ...rows].join('\n');
       }
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
